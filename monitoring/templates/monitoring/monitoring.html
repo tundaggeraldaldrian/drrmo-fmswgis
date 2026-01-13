@@ -4721,20 +4721,20 @@
                 <div class="year-selection-grid">
                     <div class="year-checkbox-wrapper">
                         <label class="year-checkbox-label">
-                            <input type="checkbox" class="year-comparison-checkbox" value="2025" checked style="accent-color: #473472;">
-                            <span>2025 (Current)</span>
+                            <input type="checkbox" class="year-comparison-checkbox" value="2026" checked style="accent-color: #7c3aed;">
+                            <span>2026 (Current)</span>
+                        </label>
+                    </div>
+                    <div class="year-checkbox-wrapper">
+                        <label class="year-checkbox-label">
+                            <input type="checkbox" class="year-comparison-checkbox" value="2025" style="accent-color: #473472;">
+                            <span>2025</span>
                         </label>
                     </div>
                     <div class="year-checkbox-wrapper">
                         <label class="year-checkbox-label">
                             <input type="checkbox" class="year-comparison-checkbox" value="2024" style="accent-color: #53629E;">
                             <span>2024</span>
-                        </label>
-                    </div>
-                    <div class="year-checkbox-wrapper">
-                        <label class="year-checkbox-label">
-                            <input type="checkbox" class="year-comparison-checkbox" value="2023" style="accent-color: #87BAC3;">
-                            <span>2023</span>
                         </label>
                     </div>
                 </div>
@@ -4751,7 +4751,7 @@
                         <i class="fas fa-info-circle" style="color: #3b82f6;"></i> 
                         Select month and day range
                     </label>
-                    <p style="font-size: 12px; color: #6b7280; margin: 0; line-height: 1.5;">
+                    <p id="custom-date-info" style="font-size: 12px; color: #6b7280; margin: 0; line-height: 1.5;">
                         Choose start and end dates (year is determined by Compare Years selection).
                     </p>
                 </div>
@@ -5574,7 +5574,7 @@
             });
         });
 
-        // Populate day dropdowns based on month selection
+        // Populate day dropdowns based on month selection and selected years
         function populateDays(monthSelectId, daySelectId) {
             const monthSelect = document.getElementById(monthSelectId);
             const daySelect = document.getElementById(daySelectId);
@@ -5585,11 +5585,98 @@
             const year = new Date().getFullYear();
             const daysInMonth = new Date(year, parseInt(month), 0).getDate();
             
+            // Get selected years to determine max available date
+            const selectedYears = Array.from(document.querySelectorAll('.year-comparison-checkbox:checked'))
+                .map(cb => parseInt(cb.value));
+            
+            // Determine max available date based on selected years
+            let maxMonth = 12;
+            let maxDay = 31;
+            
+            // If ONLY current year is selected, limit to today's date
+            const currentYear = new Date().getFullYear();
+            const onlyCurrentYearSelected = selectedYears.length > 0 && 
+                                           selectedYears.every(y => y === currentYear);
+            
+            if (onlyCurrentYearSelected) {
+                const today = new Date();
+                maxMonth = today.getMonth() + 1; // JS months are 0-indexed
+                maxDay = today.getDate();
+            }
+            
             daySelect.innerHTML = '<option value="">Day</option>';
             for (let i = 1; i <= daysInMonth; i++) {
                 const day = i < 10 ? '0' + i : i.toString();
-                daySelect.innerHTML += `<option value="${day}">${i}</option>`;
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = i;
+                
+                // Disable days beyond max available date
+                if (onlyCurrentYearSelected && parseInt(month) === maxMonth && i > maxDay) {
+                    option.disabled = true;
+                    option.style.color = '#9ca3af';
+                    option.textContent = i + ' (No data)';
+                }
+                
+                daySelect.appendChild(option);
             }
+        }
+        
+        // Restrict month options based on selected years
+        function restrictMonthOptions() {
+            const selectedYears = Array.from(document.querySelectorAll('.year-comparison-checkbox:checked'))
+                .map(cb => parseInt(cb.value));
+            
+            const currentYear = new Date().getFullYear();
+            const onlyCurrentYearSelected = selectedYears.length > 0 && 
+                                           selectedYears.every(y => y === currentYear);
+            
+            // Update info text
+            const infoText = document.getElementById('custom-date-info');
+            if (onlyCurrentYearSelected) {
+                const today = new Date();
+                const dateStr = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                infoText.innerHTML = `<strong>Note:</strong> Only ${currentYear} is selected. Available dates: January 1 - ${dateStr} (data available up to today).`;
+                infoText.style.color = '#059669';
+                infoText.style.fontWeight = '600';
+            } else {
+                infoText.textContent = 'Choose start and end dates (year is determined by Compare Years selection).';
+                infoText.style.color = '#6b7280';
+                infoText.style.fontWeight = '400';
+            }
+            
+            if (onlyCurrentYearSelected) {
+                const today = new Date();
+                const currentMonth = today.getMonth() + 1;
+                
+                // Disable months beyond current month in both dropdowns
+                ['start-month', 'end-month'].forEach(selectId => {
+                    const monthSelect = document.getElementById(selectId);
+                    Array.from(monthSelect.options).forEach(option => {
+                        const monthValue = parseInt(option.value);
+                        if (monthValue > currentMonth) {
+                            option.disabled = true;
+                            option.style.color = '#9ca3af';
+                        } else {
+                            option.disabled = false;
+                            option.style.color = '';
+                        }
+                    });
+                });
+            } else {
+                // Enable all months if any past year is selected
+                ['start-month', 'end-month'].forEach(selectId => {
+                    const monthSelect = document.getElementById(selectId);
+                    Array.from(monthSelect.options).forEach(option => {
+                        option.disabled = false;
+                        option.style.color = '';
+                    });
+                });
+            }
+            
+            // Refresh day options after month restriction
+            populateDays('start-month', 'start-day');
+            populateDays('end-month', 'end-day');
         }
         
         // Initialize day dropdowns with current month
@@ -5614,8 +5701,14 @@
         
         // Year selection event listeners - checkbox change triggers immediate update
         document.querySelectorAll('.year-comparison-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', applyYearComparison);
+            checkbox.addEventListener('change', function() {
+                restrictMonthOptions(); // Update available dates
+                applyYearComparison(); // Apply year comparison
+            });
         });
+        
+        // Initialize month/day restrictions on page load
+        restrictMonthOptions();
         
         updateTrendsTable({{ rainfall_timestamps|safe }}, {{ rainfall_values|safe }}, {{ tide_values|safe }});
     });
@@ -5644,17 +5737,26 @@
         const checkedBoxes = document.querySelectorAll('.year-comparison-checkbox:checked');
         const selectedYears = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
         
-        // If no years selected, default to 2025
+        // If no years selected, default to current year (2026)
         if (selectedYears.length === 0) {
-            document.querySelector('.year-comparison-checkbox[value="2025"]').checked = true;
-            selectedYears.push(2025);
+            const currentYear = new Date().getFullYear();
+            const currentYearCheckbox = document.querySelector(`.year-comparison-checkbox[value="${currentYear}"]`);
+            if (currentYearCheckbox) {
+                currentYearCheckbox.checked = true;
+                selectedYears.push(currentYear);
+            } else {
+                // Fallback if current year checkbox doesn't exist
+                document.querySelector('.year-comparison-checkbox').checked = true;
+                selectedYears.push(parseInt(document.querySelector('.year-comparison-checkbox').value));
+            }
         }
         
         // Sort years in descending order
         selectedYears.sort((a, b) => b - a);
 
-        // Color mapping for years
+        // Color mapping for years (now supports any year dynamically)
         const yearColors = {
+            2026: { border: 'rgba(124, 58, 237, 1)', bg: 'rgba(124, 58, 237, 0.2)' }, // Violet
             2025: { border: 'rgba(71, 52, 114, 1)', bg: 'rgba(71, 52, 114, 0.2)' }, // Purple
             2024: { border: 'rgba(83, 98, 158, 1)', bg: 'rgba(83, 98, 158, 0.2)' }, // Blue
             2023: { border: 'rgba(135, 186, 195, 1)', bg: 'rgba(135, 186, 195, 0.2)' }  // Light Blue
@@ -5948,7 +6050,13 @@
         
         // Must have at least one year selected
         if (selectedYears.length === 0) {
-            document.querySelector('.year-comparison-checkbox[value="2025"]').checked = true;
+            const currentYear = new Date().getFullYear();
+            const currentYearCheckbox = document.querySelector(`.year-comparison-checkbox[value="${currentYear}"]`);
+            if (currentYearCheckbox) {
+                currentYearCheckbox.checked = true;
+            } else {
+                document.querySelector('.year-comparison-checkbox').checked = true;
+            }
             applyCustomDateRange();
             return;
         }
@@ -5976,8 +6084,9 @@
             btn.classList.remove('btn-primary');
         });
 
-        // Color mapping for years
+        // Color mapping for years (supports any year dynamically)
         const yearColors = {
+            2026: { border: 'rgba(124, 58, 237, 1)', bg: 'rgba(124, 58, 237, 0.2)' }, // Violet
             2025: { border: 'rgba(71, 52, 114, 1)', bg: 'rgba(71, 52, 114, 0.2)' }, // Purple
             2024: { border: 'rgba(83, 98, 158, 1)', bg: 'rgba(83, 98, 158, 0.2)' }, // Blue
             2023: { border: 'rgba(135, 186, 195, 1)', bg: 'rgba(135, 186, 195, 0.2)' }  // Light Blue
@@ -6233,15 +6342,22 @@
 
     // Year Selection Functions
     function applyYearComparison() {
-        // Get ALL checked years (including 2025)
+        // Get ALL checked years (including current year)
         const checkedBoxes = document.querySelectorAll('.year-comparison-checkbox:checked');
         const selectedYears = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
         
         // Must have at least one year selected
         if (selectedYears.length === 0) {
-            // Re-check 2025 as default and trigger update
-            document.querySelector('.year-comparison-checkbox[value="2025"]').checked = true;
-            // Recursively call to update with 2025 data
+            // Re-check current year as default and trigger update
+            const currentYear = new Date().getFullYear();
+            const currentYearCheckbox = document.querySelector(`.year-comparison-checkbox[value="${currentYear}"]`);
+            if (currentYearCheckbox) {
+                currentYearCheckbox.checked = true;
+            } else {
+                // Fallback to first checkbox if current year not found
+                document.querySelector('.year-comparison-checkbox').checked = true;
+            }
+            // Recursively call to update with current year data
             applyYearComparison();
             return;
         }
@@ -6431,8 +6547,9 @@
         console.log('Rainfall datasets keys:', Object.keys(datasets.rainfall)); // Debug logging
         console.log('Tide datasets keys:', Object.keys(datasets.tide)); // Debug logging
         
-        // Define colors for different years
+        // Define colors for different years (supports any year dynamically)
         const yearColors = {
+       2026: { border: 'rgba(124, 58, 237, 1)', bg: 'rgba(124, 58, 237, 0.2)' },  // Violet
        2025: { border: 'rgba(71, 52, 114, 1)', bg: 'rgba(71, 52, 114, 0.2)' },  // Purple
        2024: { border: 'rgba(83, 98, 158, 1)', bg: 'rgba(83, 98, 158, 0.2)' },  // Blue
        2023: { border: 'rgba(135, 186, 195, 1)', bg: 'rgba(135, 186, 195, 0.2)' },  // Light Blue

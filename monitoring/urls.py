@@ -6,7 +6,6 @@ urlpatterns = [
     path('api/data/', views.fetch_data_api, name='fetch_data'),
     path('api/trends/', views.fetch_trends_api, name='fetch_trends'),
     path('api/current-risk/', views.get_current_risk_status, name='get_current_risk_status'),
-    path('api/historical-risk/', views.get_historical_risk_data, name='get_historical_risk_data'),
     path('flood-record/', views.flood_record_form, name='flood_record_form'),
     path('flood-record/edit/<int:record_id>/', views.flood_record_edit, name='flood_record_edit'),
     path('flood-record/delete/<int:record_id>/', views.flood_record_delete, name='flood_record_delete'),

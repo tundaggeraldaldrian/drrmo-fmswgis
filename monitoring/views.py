@@ -384,7 +384,6 @@ def generate_flood_insights(weather_forecast, rainfall_data, tide_data, flood_re
     # Add time-based insights
     # Get current hour in Philippines timezone (Asia/Manila)
     from django.utils import timezone as tz
-    import pytz
     manila_tz = pytz.timezone('Asia/Manila')
     current_time = tz.now().astimezone(manila_tz)
     current_hour = current_time.hour
@@ -863,110 +862,10 @@ def fetch_data_api(request):
         return JsonResponse({'error': 'Unable to fetch data'}, status=500)
 
 @login_required
-def get_historical_risk_data(request):
-    """API endpoint for time-series - returns historical flood risk data by timestamp."""
-    try:
-        from django.utils.timezone import localtime
-        from datetime import datetime
-        
-        # Get the requested timestamp from query parameters
-        timestamp_str = request.GET.get('timestamp')
-        if not timestamp_str:
-            return JsonResponse({'error': 'Timestamp parameter required'}, status=400)
-        
-        try:
-            # Parse the timestamp (expected format: YYYY-MM-DD HH:MM)
-            requested_time = timezone.datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M')
-            requested_time = timezone.make_aware(requested_time, timezone.get_current_timezone())
-        except ValueError:
-            return JsonResponse({'error': 'Invalid timestamp format. Use YYYY-MM-DD HH:MM'}, status=400)
-        
-        # Find the closest records to the requested timestamp (within 30 minutes)
-        time_range_start = requested_time - timedelta(minutes=30)
-        time_range_end = requested_time + timedelta(minutes=30)
-        
-        rainfall_data = RainfallData.objects.filter(
-            timestamp__isnull=False,
-            timestamp__gte=time_range_start,
-            timestamp__lte=time_range_end
-        ).order_by('timestamp').first()
-        
-        tide_data = TideLevelData.objects.filter(
-            timestamp__isnull=False,
-            timestamp__gte=time_range_start,
-            timestamp__lte=time_range_end
-        ).order_by('timestamp').first()
-        
-        weather_data = WeatherData.objects.filter(
-            timestamp__isnull=False,
-            timestamp__gte=time_range_start,
-            timestamp__lte=time_range_end
-        ).order_by('timestamp').first()
-        
-        # If no data found in the time range, return error
-        if not rainfall_data or not tide_data:
-            return JsonResponse({
-                'error': 'No data available for the requested time',
-                'timestamp': timestamp_str
-            }, status=404)
-        
-        # Get current values
-        current_rainfall_mm = rainfall_data.value_mm if rainfall_data else 0
-        current_tide_m = tide_data.height_m if tide_data else 0
-        
-        # Calculate risk levels
-        rain_risk_level, rain_risk_color = get_flood_risk_level(current_rainfall_mm)
-        tide_risk_level, tide_risk_color = get_tide_risk_level(current_tide_m)
-        combined_risk_level, combined_risk_color = get_combined_risk_level(current_rainfall_mm, current_tide_m)
-        
-        # Determine which zones to highlight based on risk level
-        zones_to_highlight = []
-        if combined_risk_level == "High Risk":
-            zones_to_highlight = ['VHF', 'HF']
-        elif combined_risk_level == "Moderate Risk":
-            zones_to_highlight = ['VHF', 'HF', 'MF']
-        
-        # Get benchmark thresholds for reference
-        settings = BenchmarkSettings.get_settings()
-        
-        data = {
-            'risk_level': combined_risk_level,
-            'risk_color': combined_risk_color,
-            'rain_risk_level': rain_risk_level,
-            'tide_risk_level': tide_risk_level,
-            'rainfall_mm': current_rainfall_mm,
-            'tide_m': current_tide_m,
-            'temperature_c': weather_data.temperature_c if weather_data else None,
-            'humidity_percent': weather_data.humidity_percent if weather_data else None,
-            'wind_speed_kph': weather_data.wind_speed_kph if weather_data else None,
-            'zones_to_highlight': zones_to_highlight,
-            'timestamp': localtime(rainfall_data.timestamp).strftime('%b %d, %Y %I:%M %p') if rainfall_data.timestamp else timestamp_str,
-            'requested_time': timestamp_str,
-            'is_historical': True,
-            'thresholds': {
-                'rainfall_moderate': settings.rainfall_moderate_threshold,
-                'rainfall_high': settings.rainfall_high_threshold,
-                'tide_moderate': settings.tide_moderate_threshold,
-                'tide_high': settings.tide_high_threshold,
-            }
-        }
-        
-        # Return with no-cache headers
-        response = JsonResponse(data)
-        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = '0'
-        return response
-    except Exception as e:
-        logger.error(f"Error in get_historical_risk_data: {e}")
-        return JsonResponse({'error': f'Unable to fetch historical data: {str(e)}'}, status=500)
-
-@login_required
 def fetch_trends_api(request):
     """API endpoint for fetching trend data with time range filtering and multi-year comparison."""
     try:
         from datetime import datetime, date
-        import pytz
         
         # Define Manila timezone for timestamp formatting
         manila_tz = pytz.timezone('Asia/Manila')
@@ -997,10 +896,6 @@ def fetch_trends_api(request):
                 # Validation: end date should be after start date
                 if end_date < start_date:
                     return JsonResponse({'error': 'End date must be after start date'}, status=400)
-                
-                # Validation: no future dates
-                if start_date > now.date() or end_date > now.date():
-                    return JsonResponse({'error': 'Cannot select future dates'}, status=400)
                 
                 # Validation: reasonable range (max 2 years)
                 date_diff = (end_date - start_date).days
@@ -1087,14 +982,20 @@ def fetch_trends_api(request):
                     adjusted_filter = timezone.make_aware(datetime(target_year, 1, 1, 0, 0, 0))
                     adjusted_now = timezone.make_aware(datetime(target_year, 12, 31, 23, 59, 59))
                 else:
-                    # Shift the time filter to the corresponding period in the target year
-                    try:
-                        adjusted_filter = time_filter.replace(year=target_year)
-                        adjusted_now = now.replace(year=target_year)
-                    except ValueError:
-                        # Handle leap year issues (e.g., Feb 29)
-                        adjusted_filter = time_filter.replace(year=target_year, day=28) if time_filter.month == 2 else time_filter.replace(year=target_year)
-                        adjusted_now = now.replace(year=target_year, day=28) if now.month == 2 else now.replace(year=target_year)
+                    # For current year (year_offset=0), use actual time filter without modification
+                    if year_offset == 0:
+                        # Current year - use the actual time range
+                        adjusted_filter = time_filter
+                        adjusted_now = now
+                    else:
+                        # For past years - shift the time filter to the corresponding period in the target year
+                        try:
+                            adjusted_filter = time_filter.replace(year=target_year)
+                            adjusted_now = now.replace(year=target_year)
+                        except ValueError:
+                            # Handle leap year issues (e.g., Feb 29)
+                            adjusted_filter = time_filter.replace(year=target_year, day=28) if time_filter.month == 2 else time_filter.replace(year=target_year)
+                            adjusted_now = now.replace(year=target_year, day=28) if now.month == 2 else now.replace(year=target_year)
                 
                 rainfall = list(RainfallData.objects.filter(
                     timestamp__gte=adjusted_filter,
