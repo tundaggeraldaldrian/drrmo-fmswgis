@@ -19,7 +19,7 @@
         border: 1px solid var(--border-gray);
         margin-bottom: 28px;
     }
-
+    
     .header-top {
         display: flex;
         justify-content: space-between;
