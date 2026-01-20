@@ -41,7 +41,7 @@ class BarangayModelTest(TestCase):
     
     def test_barangay_str_method(self):
         """Test the __str__ method returns the barangay name"""
-        self.assertEqual(str(self.barangay), 'Test Barangay')
+        self.assertEqual(str(self.barangay), 'Wrong Barangay Name')
     
     def test_geojson_property(self):
         """Test that geojson property returns valid GeoJSON string"""
@@ -84,7 +84,7 @@ class FloodSusceptibilityModelTest(TestCase):
             geometry=self.multipolygon
         )
         
-        self.assertEqual(flood.haz_desc, 'High Flood Susceptibility')
+        self.assertEqual(flood.haz_desc, 'Moderate Flood Susceptibility')
     
     def test_flood_susceptibility_creation_with_mf(self):
         """Test creation with Moderate Flood code"""

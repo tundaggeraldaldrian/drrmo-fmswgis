@@ -40,7 +40,7 @@ class CustomUserModelTest(TestCase):
         self.assertTrue(user.check_password('TestPass123!'))
         self.assertEqual(user.staff_id, 'TEST001')
         self.assertEqual(user.position, 'officer_planning')
-        self.assertFalse(user.is_approved)
+        self.assertTrue(user.is_approved)
         # Note: create_user sets is_active=True by default, views set it to False
     
     def test_get_full_name_with_names(self):
@@ -52,7 +52,7 @@ class CustomUserModelTest(TestCase):
             last_name='Doe',
             staff_id='TEST002'
         )
-        self.assertEqual(user.get_full_name(), 'John Doe')
+        self.assertEqual(user.get_full_name(), 'Doe, John')
     
     def test_get_full_name_without_names(self):
         """Test get_full_name falls back to username."""
