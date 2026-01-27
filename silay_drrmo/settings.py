@@ -37,7 +37,12 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # Allowed hosts - add your domain in production
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.dev']
-CSRF_TRUSTED_ORIGINS = ['https://zoe-sonic-katy.ngrok-free.dev', 'http://zoe-sonic-katy.ngrok-free.dev']
+CSRF_TRUSTED_ORIGINS = [
+    'https://zoe-sonic-katy.ngrok-free.dev', 
+    'http://zoe-sonic-katy.ngrok-free.dev',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition
@@ -425,10 +430,11 @@ LOGIN_URL = '/'
 # ============================================
 
 if not DEBUG:
-    # HTTPS/SSL settings
+    # HTTPS/SSL settings - PRODUCTION ONLY
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
     
     # HSTS settings
     SECURE_HSTS_SECONDS = 31536000  # 1 year
@@ -445,6 +451,11 @@ if not DEBUG:
         'font-src': ("'self'", "fonts.gstatic.com"),
         'img-src': ("'self'", "data:", "https:"),
     }
+else:
+    # DEVELOPMENT settings - Allow HTTP and easier debugging
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_HTTPONLY = False
 
 
 # ============================================
@@ -454,4 +465,3 @@ if not DEBUG:
 SESSION_COOKIE_AGE = 86400  # 24 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
