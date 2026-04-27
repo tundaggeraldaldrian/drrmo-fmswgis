@@ -407,8 +407,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # These are required for GeoDjango to work with spatial data
 
 if os.name != "nt":  # Unix/Linux systems (not Windows)
-    os.environ["GDAL_LIBRARY_PATH"] = "/usr/lib/libgdal.so"
-    os.environ["GEOS_LIBRARY_PATH"] = "/usr/lib/libgeos_c.so"
+    os.environ["GDAL_LIBRARY_PATH"] = "/usr/lib/x86_64-linux-gnu/libgdal.so"
+    os.environ["GEOS_LIBRARY_PATH"] = "/usr/lib/x86_64-linux-gnu/libgeos_c.so"
 else:  # Windows systems
     # Uncomment and set these paths if you're using OSGeo4W on Windows
     # GDAL_LIBRARY_PATH = r"C:\OSGeo4W\bin\gdal310.dll"
