@@ -16,7 +16,10 @@ ARG APP_HOME=/app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # Redirect XDG cache (Fontconfig, etc.) to /tmp so the non-root user
+    # always has a writable cache directory (fixes WeasyPrint PDF font errors)
+    XDG_CACHE_HOME=/tmp/cache
 
 # -------------------------------------------------------
 # System dependencies

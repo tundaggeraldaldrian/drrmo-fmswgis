@@ -42,7 +42,7 @@ ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
 
 # CSRF trusted origins — comma-separated list from CSRF_TRUSTED_ORIGINS env var.
 # Example in .env: CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
-_csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000')
+_csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1')
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_env.split(',') if o.strip()]
 
 

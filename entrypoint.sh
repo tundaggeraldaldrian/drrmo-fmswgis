@@ -35,7 +35,7 @@ python manage.py collectstatic --no-input --clear
 #    re-importing on every container restart.
 # -------------------------------------------------------
 echo "[4/5] Checking GIS data..."
-BARANGAY_COUNT=$(python manage.py shell -c "from maps.models import Barangay; print(Barangay.objects.count())" 2>/dev/null || echo "0")
+BARANGAY_COUNT=$(python manage.py shell -c "from maps.models import Barangay; print(Barangay.objects.count())" 2>/dev/null | tail -1 || echo "0")
 if [ "$BARANGAY_COUNT" = "0" ]; then
     echo "  Loading shapefiles (first run)..."
     python manage.py load_shapefiles
