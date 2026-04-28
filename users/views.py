@@ -19,6 +19,9 @@ def register(request):
     Staff ID Format: YEAR + sequential 4-digit number (e.g., 20250001)
     The user account is created as inactive pending admin approval.
     
+    Uses select_for_update() inside transaction.atomic() to prevent race conditions
+    when two users register simultaneously and could receive the same Staff ID.
+    
     Args:
         request: HttpRequest object
         
@@ -32,29 +35,31 @@ def register(request):
             user.is_active = False
             user.is_approved = False
             
-            # Auto-generate staff ID
             from datetime import datetime
             current_year = datetime.now().year
             
-            # Get the last staff ID for this year
-            last_user = CustomUser.objects.filter(
-                staff_id__startswith=str(current_year)
-            ).order_by('-staff_id').first()
-            
-            if last_user and last_user.staff_id:
-                # Extract the sequential number and increment
-                try:
-                    last_number = int(last_user.staff_id[-4:])
-                    new_number = last_number + 1
-                except (ValueError, TypeError):
+            with transaction.atomic():
+                # Lock existing staff IDs for this year to prevent concurrent duplicates
+                existing_ids = list(
+                    CustomUser.objects.filter(
+                        staff_id__startswith=str(current_year)
+                    ).select_for_update().order_by('-staff_id')
+                    .values_list('staff_id', flat=True)
+                )
+                
+                if existing_ids:
+                    try:
+                        last_number = int(existing_ids[0][-4:])
+                        new_number = last_number + 1
+                    except (ValueError, TypeError):
+                        new_number = 1
+                else:
                     new_number = 1
-            else:
-                new_number = 1
+                
+                # Format: YEAR + 4-digit sequential number (e.g., 20260001)
+                user.staff_id = f"{current_year}{new_number:04d}"
+                user.save()
             
-            # Format: YEAR + 4-digit number (e.g., 20250001)
-            user.staff_id = f"{current_year}{new_number:04d}"
-            
-            user.save()
             messages.success(request, f'Account created successfully! Your Staff ID is {user.staff_id}. Please wait for admin approval.')
             return redirect('login')
     else:
@@ -172,25 +177,27 @@ def admin_register(request):
             with transaction.atomic():
                 user = form.save(commit=False)
                 
-                # Auto-generate staff ID for admin
                 from datetime import datetime
                 current_year = datetime.now().year
                 
-                # Get the last staff ID for this year
-                last_user = CustomUser.objects.filter(
-                    staff_id__startswith=str(current_year)
-                ).order_by('-staff_id').first()
+                # Lock existing IDs for this year to prevent concurrent duplicate generation
+                existing_ids = list(
+                    CustomUser.objects.filter(
+                        staff_id__startswith=str(current_year)
+                    ).select_for_update().order_by('-staff_id')
+                    .values_list('staff_id', flat=True)
+                )
                 
-                if last_user and last_user.staff_id:
+                if existing_ids:
                     try:
-                        last_number = int(last_user.staff_id[-4:])
+                        last_number = int(existing_ids[0][-4:])
                         new_number = last_number + 1
                     except (ValueError, TypeError):
                         new_number = 1
                 else:
                     new_number = 1
                 
-                # Format: YEAR + 4-digit number (e.g., 20250001)
+                # Format: YEAR + 4-digit sequential number (e.g., 20260001)
                 user.staff_id = f"{current_year}{new_number:04d}"
                 
                 # Set admin privileges
@@ -231,16 +238,26 @@ def home(request):
             ReportRecord.objects.count() +
             CertificateRecord.objects.count()
         )
-        # Most active users: top 5 users with most UserLog entries
+        # Most active users: top 5 users with most UserLog entries.
+        # Uses 2 queries (aggregation + bulk fetch) instead of 1+N to avoid N+1 query problem.
         from django.db.models import Count
-        most_active_query = UserLog.objects.values('user__username', 'user__id').annotate(activity_count=Count('id')).order_by('-activity_count')[:5]
+        activity_qs = (
+            UserLog.objects
+            .values('user')
+            .annotate(activity_count=Count('id'))
+            .order_by('-activity_count')[:5]
+        )
+        ordered_user_ids = [row['user'] for row in activity_qs]
+        activity_count_map = {row['user']: row['activity_count'] for row in activity_qs}
+        user_map = {u.id: u for u in CustomUser.objects.filter(id__in=ordered_user_ids)}
         most_active_users = []
-        for user_data in most_active_query:
-            # Get the actual user object to access profile_image
-            user_obj = CustomUser.objects.get(id=user_data['user__id'])
+        for uid in ordered_user_ids:
+            user_obj = user_map.get(uid)
+            if not user_obj:
+                continue
             user_info = type('MostActiveUser', (), {})()
-            user_info.username = user_data['user__username']
-            user_info.activity_count = user_data['activity_count']
+            user_info.username = user_obj.username
+            user_info.activity_count = activity_count_map[uid]
             user_info.profile_image = user_obj.profile_image
             user_info.full_name = user_obj.get_full_name()
             most_active_users.append(user_info)
@@ -293,41 +310,24 @@ def home(request):
     tide_data = TideLevelData.objects.filter(timestamp__isnull=False).first()
     recent_floods = FloodRecord.objects.all().order_by('-date')[:3]
     
-    # Calculate highest risk barangay based on flood susceptibility data
+    # Calculate highest risk barangay based on flood susceptibility data.
+    # Uses at most 4 queries (one per risk level, stopping at first match) instead of
+    # 1 query per barangay (N+1). Checks VHF → HF → MF → LF in priority order.
     highest_risk_barangay = None
     try:
-        # Priority order: VHF (Very High) > HF (High) > MF (Moderate) > LF (Low)
-        risk_priority = {'VHF': 4, 'HF': 3, 'MF': 2, 'LF': 1}
         risk_level_map = {'VHF': 'Critical', 'HF': 'High', 'MF': 'Moderate', 'LF': 'Low'}
-        
-        # Get all barangays
-        barangays = Barangay.objects.all()
-        barangay_risks = []
-        
-        for barangay in barangays:
-            # Find flood susceptibility areas that intersect with this barangay
-            flood_areas = FloodSusceptibility.objects.filter(
-                geometry__intersects=barangay.geometry
-            ).order_by('-haz_code')
-            
-            if flood_areas.exists():
-                # Get the highest risk code for this barangay
-                highest_code = flood_areas.first().haz_code
-                risk_score = risk_priority.get(highest_code, 0)
-                barangay_risks.append({
-                    'name': barangay.name,
-                    'risk_code': highest_code,
-                    'risk_level': risk_level_map.get(highest_code, 'Unknown'),
-                    'risk_score': risk_score
-                })
-        
-        # Sort by risk score descending and get the highest
-        if barangay_risks:
-            barangay_risks.sort(key=lambda x: x['risk_score'], reverse=True)
-            highest = barangay_risks[0]
-            highest_risk_barangay = type('HighestRiskBarangay', (), {})()
-            highest_risk_barangay.name = highest['name']
-            highest_risk_barangay.risk_level = highest['risk_level']
+        for risk_code in ['VHF', 'HF', 'MF', 'LF']:
+            zone = FloodSusceptibility.objects.filter(haz_code=risk_code).first()
+            if not zone:
+                continue
+            barangay = Barangay.objects.filter(
+                geometry__intersects=zone.geometry
+            ).first()
+            if barangay:
+                highest_risk_barangay = type('HighestRiskBarangay', (), {})()
+                highest_risk_barangay.name = barangay.name
+                highest_risk_barangay.risk_level = risk_level_map[risk_code]
+                break
     except Exception as e:
         print(f"Error calculating highest risk barangay: {e}")
         highest_risk_barangay = None
@@ -404,8 +404,17 @@ def home(request):
 @login_required
 @staff_member_required
 def user_logs(request):
-    logs = UserLog.objects.all().order_by('-timestamp')[:10]  # Last 10 logs
-    return render(request, 'users/user_logs.html', {'logs': logs})
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    logs_qs = UserLog.objects.select_related('user').order_by('-timestamp')
+    paginator = Paginator(logs_qs, 25)  # 25 logs per page
+    page_number = request.GET.get('page', 1)
+    try:
+        logs = paginator.page(page_number)
+    except PageNotAnInteger:
+        logs = paginator.page(1)
+    except EmptyPage:
+        logs = paginator.page(paginator.num_pages)
+    return render(request, 'users/user_logs.html', {'logs': logs, 'paginator': paginator})
 
 @login_required
 def view_profile(request):

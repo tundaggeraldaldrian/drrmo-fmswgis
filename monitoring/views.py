@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -322,7 +321,7 @@ def generate_flood_insights(weather_forecast, rainfall_data, tide_data, flood_re
 
     insights['forecast_analysis'].append({
         'title': 'Temperature Trend',
-        'analysis': f'Average maximum temperature: {avg_temp:.1f}Â°C. {"High temperatures may intensify rainfall events." if avg_temp > 32 else "Temperatures within normal range."}',
+        'analysis': f'Average maximum temperature: {avg_temp:.1f}\u00b0C. {"High temperatures may intensify rainfall events." if avg_temp > 32 else "Temperatures within normal range."}',
         'impact': 'moderate' if avg_temp > 32 else 'low'
     })
 
@@ -1412,7 +1411,6 @@ def benchmark_settings_view(request):
 
 
 @login_required
-@csrf_exempt
 def export_trends(request):
     """Export rainfall and tide trends data to CSV or PDF"""
     import csv

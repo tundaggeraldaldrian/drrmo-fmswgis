@@ -254,7 +254,6 @@ def certificate_view(request):
 @login_required
 def save_assessment(request):
     from django.http import JsonResponse
-    from django.views.decorators.csrf import csrf_exempt
     
     if request.method == 'POST':
         barangay = request.POST.get('barangay', 'Unknown')
@@ -345,6 +344,7 @@ def all_activities(request):
     from django.core.paginator import Paginator
     from django.db.models import Q
     from datetime import datetime, timedelta
+    from django.utils import timezone as tz
     
     if not request.user.is_staff:
         raise PermissionDenied
@@ -396,11 +396,11 @@ def all_activities(request):
     if not any([filter_user, filter_date, date_from, date_to, date_range, search_query, show_all]):
         date_range = '30'  # Default to last 30 days
     
-    # Apply date range quick filters
+    # Apply date range quick filters (use tz.now() — timezone-aware, required when USE_TZ=True)
     if date_range and date_range != 'all':
         try:
             days = int(date_range)
-            start_date = datetime.now() - timedelta(days=days)
+            start_date = tz.now() - timedelta(days=days)
             assessments = assessments.filter(timestamp__gte=start_date)
             reports = reports.filter(timestamp__gte=start_date)
             certificates = certificates.filter(timestamp__gte=start_date)
@@ -651,11 +651,12 @@ def export_activities(request):
         flood_activities = flood_activities.order_by('-timestamp')
         user_logs = user_logs.order_by('-timestamp')
     
-    # Apply date range quick filters
+    # Apply date range quick filters (use timezone.now() to avoid naive datetime RuntimeWarning)
     if date_range and date_range != 'all':
         try:
+            from django.utils import timezone as tz
             days = int(date_range)
-            start_date = datetime.now() - timedelta(days=days)
+            start_date = tz.now() - timedelta(days=days)
             assessments = assessments.filter(timestamp__gte=start_date)
             reports = reports.filter(timestamp__gte=start_date)
             certificates = certificates.filter(timestamp__gte=start_date)

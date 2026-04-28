@@ -8,4 +8,5 @@ logs/
 .DS_Store
 venv/
 env/
-node_modules
+env-drrmo/
+node_modules/

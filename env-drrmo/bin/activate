@@ -39,10 +39,10 @@ deactivate nondestructive
 if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
     # transform D:\path\to\venv to /d/path/to/venv on MSYS
     # and to /cygdrive/d/path/to/venv on Cygwin
-    export VIRTUAL_ENV=$(cygpath /home/agt/Projects/capstone-project-fmswgis/env-drrmo)
+    export VIRTUAL_ENV=$(cygpath /home/agt/Projects/drrmo-fmswgis/env-drrmo)
 else
     # use the path as-is
-    export VIRTUAL_ENV=/home/agt/Projects/capstone-project-fmswgis/env-drrmo
+    export VIRTUAL_ENV=/home/agt/Projects/drrmo-fmswgis/env-drrmo
 fi
 
 _OLD_VIRTUAL_PATH="$PATH"

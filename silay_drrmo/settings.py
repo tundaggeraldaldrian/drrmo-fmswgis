@@ -35,14 +35,15 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ray+$42+3p@)$4w00ul5-eftyn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# Allowed hosts - add your domain in production
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.dev']
-CSRF_TRUSTED_ORIGINS = [
-    'https://zoe-sonic-katy.ngrok-free.dev', 
-    'http://zoe-sonic-katy.ngrok-free.dev',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-]
+# Allowed hosts — comma-separated list from ALLOWED_HOSTS env var.
+# Example in .env: ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,localhost
+_allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.ngrok-free.app')
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
+
+# CSRF trusted origins — comma-separated list from CSRF_TRUSTED_ORIGINS env var.
+# Example in .env: CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+_csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000')
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_env.split(',') if o.strip()]
 
 
 # Application definition
@@ -62,6 +63,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise serves compressed, cached static files directly via Gunicorn (no Nginx needed for /static/).
+    # Must be placed immediately after SecurityMiddleware.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -146,6 +150,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'silay_drrmo/static')]
+
+# WhiteNoise: serve compressed, content-hashed static files in production.
+# CompressedManifestStaticFilesStorage adds a hash to filenames (e.g. app.abc123.js)
+# so browsers always get fresh files after deployments.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Media files (user uploaded content)
 MEDIA_URL = '/media/'
@@ -407,8 +423,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # These are required for GeoDjango to work with spatial data
 
 if os.name != "nt":  # Unix/Linux systems (not Windows)
-    os.environ["GDAL_LIBRARY_PATH"] = "/usr/lib/x86_64-linux-gnu/libgdal.so"
-    os.environ["GEOS_LIBRARY_PATH"] = "/usr/lib/x86_64-linux-gnu/libgeos_c.so"
+    # Paths are configurable via env vars so they work in Docker and bare-metal equally.
+    # Defaults match Ubuntu 22.04/24.04 and Debian Bookworm x86_64.
+    os.environ["GDAL_LIBRARY_PATH"] = os.getenv(
+        "GDAL_LIBRARY_PATH", "/usr/lib/x86_64-linux-gnu/libgdal.so"
+    )
+    os.environ["GEOS_LIBRARY_PATH"] = os.getenv(
+        "GEOS_LIBRARY_PATH", "/usr/lib/x86_64-linux-gnu/libgeos_c.so"
+    )
 else:  # Windows systems
     # Uncomment and set these paths if you're using OSGeo4W on Windows
     # GDAL_LIBRARY_PATH = r"C:\OSGeo4W\bin\gdal310.dll"
