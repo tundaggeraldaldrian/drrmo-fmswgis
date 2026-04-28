@@ -151,15 +151,17 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'silay_drrmo/static')]
 
-# WhiteNoise: serve compressed, content-hashed static files in production.
-# CompressedManifestStaticFilesStorage adds a hash to filenames (e.g. app.abc123.js)
-# so browsers always get fresh files after deployments.
+# WhiteNoise: serve gzip/brotli-compressed static files in production.
+# CompressedStaticFilesStorage compresses files at collectstatic time so
+# Gunicorn/Nginx serves them with Content-Encoding: gzip without overhead.
+# (CompressedManifestStaticFilesStorage adds content-hash filenames too but
+# crashes when a CSS file references a font that isn't present on disk.)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
@@ -452,27 +454,29 @@ LOGIN_URL = '/'
 # ============================================
 
 if not DEBUG:
-    # HTTPS/SSL settings - PRODUCTION ONLY
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    CSRF_COOKIE_HTTPONLY = True
-    
-    # HSTS settings
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    
-    # Other security
+    # NEVER set SECURE_SSL_REDIRECT here — Nginx (the reverse proxy) is responsible
+    # for HTTP→HTTPS redirects. If Django also redirects, it creates redirect loops.
+    SECURE_SSL_REDIRECT = False
+
+    # Tell Django it's sitting behind Nginx which terminates SSL.
+    # Nginx sets X-Forwarded-Proto: https, so Django knows the original request was HTTPS.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    # HTTPS_ENABLED=True in .env activates cookie security and HSTS.
+    # Keep False until SSL certificates are installed in Nginx.
+    _https_enabled = os.getenv('HTTPS_ENABLED', 'False') == 'True'
+
+    SESSION_COOKIE_SECURE = _https_enabled
+    CSRF_COOKIE_SECURE = _https_enabled
+    CSRF_COOKIE_HTTPONLY = _https_enabled
+
+    # HSTS — only activate after SSL is confirmed working, otherwise it bricks HTTP access
+    SECURE_HSTS_SECONDS = 31536000 if _https_enabled else 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = _https_enabled
+    SECURE_HSTS_PRELOAD = _https_enabled
+
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_CONTENT_SECURITY_POLICY = {
-        'default-src': ("'self'",),
-        'script-src': ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"),
-        'style-src': ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "fonts.googleapis.com"),
-        'font-src': ("'self'", "fonts.gstatic.com"),
-        'img-src': ("'self'", "data:", "https:"),
-    }
 else:
     # DEVELOPMENT settings - Allow HTTP and easier debugging
     CSRF_COOKIE_SECURE = False
