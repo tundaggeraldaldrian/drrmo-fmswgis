@@ -16,9 +16,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+from django.views.decorators.http import require_GET
+import os
+
+# Serve favicon
+@require_GET
+def favicon(request):
+    favicon_path = os.path.join(settings.BASE_DIR, 'silay_drrmo/static/images/drrmo_logo.png')
+    if os.path.exists(favicon_path):
+        with open(favicon_path, 'rb') as f:
+            return HttpResponse(f.read(), content_type='image/png')
+    return HttpResponse(status=404)
 
 # Main URL patterns
 urlpatterns = [
+    path('favicon.ico', favicon),  # Serve favicon
     path('admin/', admin.site.urls),  # Django admin interface
     path('', include('users.urls')),  # User authentication and profiles
     path('maps/', include('maps.urls')),  # GIS mapping features
