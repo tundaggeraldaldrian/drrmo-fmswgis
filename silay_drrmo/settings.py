@@ -425,7 +425,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # These are required for GeoDjango to work with spatial data
 
 if os.name != "nt":  # Unix/Linux systems (not Windows)
-    # Paths are configurable via env vars so they work in Docker and bare-metal equally.
+    # Paths remain configurable via env vars for flexibility across local setups.
     # Defaults match Ubuntu 22.04/24.04 and Debian Bookworm x86_64.
     os.environ["GDAL_LIBRARY_PATH"] = os.getenv(
         "GDAL_LIBRARY_PATH", "/usr/lib/x86_64-linux-gnu/libgdal.so"
