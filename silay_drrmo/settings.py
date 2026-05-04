@@ -15,11 +15,11 @@ import os
 import logging.config
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file (after BASE_DIR is defined)
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,8 +37,10 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # Allowed hosts — comma-separated list from ALLOWED_HOSTS env var.
 # Example in .env: ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,localhost
-_allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.ngrok-free.app')
-ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
+_allowed_hosts_env = os.getenv(
+    'ALLOWED_HOSTS', 'localhost,127.0.0.1,.ngrok-free.app,.ngrok-free.dev'
+)
+ALLOWED_HOSTS = ['*']  # Temporarily allow all hosts for debugging
 
 # CSRF trusted origins — comma-separated list from CSRF_TRUSTED_ORIGINS env var.
 # Example in .env: CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
