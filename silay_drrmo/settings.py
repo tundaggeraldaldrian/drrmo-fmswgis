@@ -53,8 +53,15 @@ for host in ALLOWED_HOSTS:
     if host in ('localhost', '127.0.0.1'):
         CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
     else:
-        CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
-        CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+        # Remove leading dot from wildcard patterns for valid URLs
+        clean_host = host.lstrip('.')
+        CSRF_TRUSTED_ORIGINS.append(f'http://{clean_host}')
+        CSRF_TRUSTED_ORIGINS.append(f'https://{clean_host}')
+
+# Add specific ngrok URL for development (can be overridden via NGROK_URL env var)
+ngrok_url = os.getenv('NGROK_URL')
+if ngrok_url:
+    CSRF_TRUSTED_ORIGINS.append(ngrok_url)
 
 
 # Application definition
