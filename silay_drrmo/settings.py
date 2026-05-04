@@ -35,17 +35,26 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ray+$42+3p@)$4w00ul5-eftyn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# Allowed hosts — comma-separated list from ALLOWED_HOSTS env var.
-# Example in .env: ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,localhost
-_allowed_hosts_env = os.getenv(
-    'ALLOWED_HOSTS', 'localhost,127.0.0.1,.ngrok-free.app,.ngrok-free.dev'
-)
-ALLOWED_HOSTS = ['*']  # Temporarily allow all hosts for debugging
+# Allowed hosts — auto-configured based on DEBUG mode
+# DEBUG=True: Accept localhost and any ngrok tunnel (wildcards)
+# DEBUG=False: Use single fixed production domain from .env
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.ngrok-free.dev']
+else:
+    _prod_domain = os.getenv('PRODUCTION_DOMAIN')
+    if not _prod_domain:
+        raise ValueError("PRODUCTION_DOMAIN must be set in .env when DEBUG=False")
+    ALLOWED_HOSTS = [_prod_domain]
 
-# CSRF trusted origins — comma-separated list from CSRF_TRUSTED_ORIGINS env var.
-# Example in .env: CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
-_csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1')
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_env.split(',') if o.strip()]
+# CSRF trusted origins — auto-generated from ALLOWED_HOSTS
+# For each host, generate both http:// and https:// URLs (except localhost uses http only)
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    if host in ('localhost', '127.0.0.1'):
+        CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
+    else:
+        CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
+        CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
 
 
 # Application definition
