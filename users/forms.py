@@ -9,13 +9,13 @@ class CustomUserCreationForm(UserCreationForm):
     Staff ID is automatically generated upon user creation.
     Includes date of birth validation (18-80 years old).
     """
-    class Meta:
+    class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = [
+        fields = (
             'username', 'email', 'first_name', 'last_name',
             'position', 'custom_position', 'contact_number', 'date_of_birth',
             'password1', 'password2'
-        ]
+        )
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
@@ -94,6 +94,8 @@ class CustomUserCreationForm(UserCreationForm):
     def clean(self):
         """Validate that custom_position is provided only when position is 'others'."""
         cleaned_data = super().clean()
+        if cleaned_data is None:
+            return cleaned_data
         position = cleaned_data.get('position')
         custom_position = cleaned_data.get('custom_position')
         
@@ -118,13 +120,13 @@ class AdminRegistrationForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter registration key'}),
         help_text="Enter the secure registration key provided by the system administrator."
     )
-    class Meta:
+    class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = [
+        fields = (
             'username', 'email', 'first_name', 'last_name',
             'contact_number', 'date_of_birth',
             'password1', 'password2'
-        ]
+        )
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
@@ -205,15 +207,14 @@ class ProfileEditForm(UserChangeForm):
     Form for editing user profile information.
     Excludes password field and provides validation for contact numbers and profile image.
     """
-    password = None  # Remove password field from form
-    class Meta:
+    class Meta(UserChangeForm.Meta):
         model = CustomUser
-        fields = [
+        fields = (  # type: ignore
             'first_name', 'last_name', 'email',
             'position', 'custom_position', 'contact_number',
             'emergency_contact', 'emergency_number',
             'bio', 'date_of_birth', 'profile_image'
-        ]
+        )
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
@@ -224,6 +225,8 @@ class ProfileEditForm(UserChangeForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'password' in self.fields:
+            del self.fields['password']
         for field in self.fields.values():
             if not isinstance(field.widget, (forms.CheckboxInput, forms.RadioSelect)):
                 if 'class' not in field.widget.attrs:
@@ -291,12 +294,24 @@ class ProfileEditForm(UserChangeForm):
             ext = os.path.splitext(image.name)[1].lower()
             if ext not in valid_extensions:
                 raise forms.ValidationError(f"Invalid file type. Allowed types: {', '.join(valid_extensions)}")
+            
+            # SECURITY: Deep check using Pillow to verify actual image content
+            from PIL import Image
+            try:
+                # We use a context manager or just open/verify
+                # Note: verify() doesn't return anything but raises exception on error
+                img = Image.open(image)
+                img.verify()
+            except Exception:
+                raise forms.ValidationError("The uploaded file is not a valid image or is corrupted.")
         
         return image
     
     def clean(self):
         """Validate that custom_position is provided only when position is 'others'."""
         cleaned_data = super().clean()
+        if cleaned_data is None:
+            return cleaned_data
         position = cleaned_data.get('position')
         custom_position = cleaned_data.get('custom_position')
         

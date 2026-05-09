@@ -29,22 +29,24 @@ load_dotenv(BASE_DIR / '.env')
 # SECURITY SETTINGS
 # ============================================
 # SECURITY WARNING: keep the secret key used in production secret!
-# In production, use environment variables instead of hardcoding
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ray+$42+3p@)$4w00ul5-eftyn6%5eu$57*(y)peu=1p3!3tim')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY must be set in .env file for security.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Allowed hosts — auto-configured based on DEBUG mode
-# DEBUG=True: Accept localhost and any ngrok tunnel (wildcards)
-# DEBUG=False: Use single fixed production domain from .env
 if DEBUG:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.ngrok-free.dev']
 else:
     _prod_domain = os.getenv('PRODUCTION_DOMAIN')
     if not _prod_domain:
-        raise ValueError("PRODUCTION_DOMAIN must be set in .env when DEBUG=False")
-    ALLOWED_HOSTS = [_prod_domain]
+        # In production, we MUST have a domain defined
+        ALLOWED_HOSTS = []
+    else:
+        ALLOWED_HOSTS = [_prod_domain]
 
 # CSRF trusted origins — auto-generated from ALLOWED_HOSTS
 # For each host, generate both http:// and https:// URLs (except localhost uses http only)
@@ -494,7 +496,9 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = _https_enabled
 
     SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 else:
     # DEVELOPMENT settings - Allow HTTP and easier debugging
     CSRF_COOKIE_SECURE = False

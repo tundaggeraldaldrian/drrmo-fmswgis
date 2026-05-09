@@ -1,3 +1,13 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "python.defaultInterpreterPath": "/home/agt/Projects/drrmo-fmswgis/env-drrmo/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--load-plugins=pylint_django",
+        "--django-settings-module=silay_drrmo.settings"
+    ],
+    "python.pyrefly.configPath": "/home/agt/Projects/drrmo-fmswgis/pyrefly.toml",
+    "python.pyrefly.typeCheckingMode": "basic"
 }

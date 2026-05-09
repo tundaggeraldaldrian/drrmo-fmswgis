@@ -10,12 +10,54 @@ try:
 except ImportError:
     export_utils = None
 
+from django.contrib.gis.geos import Point
+from django.utils.html import escape
+
+def get_risk_data_from_coords(lat, lon):
+    """
+    Look up the flood risk code and description from the database based on coordinates.
+    This prevents users from tampering with risk levels via URL parameters.
+    """
+    try:
+        # Create a Point object (longitude first for PostGIS)
+        pnt = Point(float(lon), float(lat), srid=4326)
+        
+        # Check which barangay this point falls into (to verify barangay name)
+        barangay = Barangay.objects.filter(geometry__intersects=pnt).first()
+        barangay_name = barangay.name if barangay else "Unknown"
+
+        # Define risk priority (higher value = higher risk)
+        risk_priority = {'VHF': 4, 'HF': 3, 'MF': 2, 'LF': 1, 'Unknown': 0}
+        
+        # Find all susceptibility zones that intersect with the point
+        zones = list(FloodSusceptibility.objects.filter(geometry__intersects=pnt))
+        
+        if not zones:
+            return 'LF', 'Low Susceptibility; less than 0.5 meters flood height and/or less than 1 day flooding', barangay_name
+            
+        # Select the zone with the highest risk level
+        best_zone = max(zones, key=lambda z: risk_priority.get(z.haz_code, 0))
+        
+        # Map descriptions (consistent with report_view logic)
+        risk_descriptions = {
+            'LF': 'Low Susceptibility; less than 0.5 meters flood height and/or less than 1 day flooding',
+            'MF': 'Moderate Susceptibility; 0.5 to 1 meter flood height and/or 1 to 3 days flooding',
+            'HF': 'High Susceptibility; 1 to 2 meters flood height and/or more than 3 days flooding',
+            'VHF': 'Very High Susceptibility; more than 2 meters flood height and/or more than 3 days flooding'
+        }
+        
+        return best_zone.haz_code, risk_descriptions.get(best_zone.haz_code, 'No assessment available'), barangay_name
+        
+    except (ValueError, TypeError, Exception):
+        return 'Unknown', 'Unable to calculate risk for these coordinates.', 'Unknown'
+
 @login_required
 def error_view(request):
-    """Display error message to user"""
-    error_title = request.GET.get('title', 'An Error Occurred')
-    error_message = request.GET.get('message', 'Something went wrong. Please try again.')
-    error_details = request.GET.get('details', '')
+    """Display error message to user with sanitization"""
+    # Sanitize inputs to prevent reflected XSS
+    error_title = escape(request.GET.get('title', 'An Error Occurred'))
+    error_message = escape(request.GET.get('message', 'Something went wrong. Please try again.'))
+    error_details = escape(request.GET.get('details', ''))
     
     context = {
         'error_title': error_title,
@@ -74,35 +116,32 @@ def map_view(request):
 @login_required
 def report_view(request):
     # Get parameters from URL
-    barangay = request.GET.get('barangay', 'Unknown')
     latitude = request.GET.get('lat', '0.000000')
     longitude = request.GET.get('lon', '0.000000')
-    risk_code = request.GET.get('risk', 'Unknown')
+    
+    # SECURITY: Validate coordinates and risk server-side
+    risk_code, assessment_text, barangay = get_risk_data_from_coords(latitude, longitude)
     
     # Risk assessment and recommendation mapping
     risk_data = {
         'LF': {
             'label': 'Low Susceptibility; less than 0.5 meters flood height and/or less than 1 day flooding',
             'class': 'risk-low',
-            'assessment': 'Low Susceptibility; less than 0.5 meters flood height and/or less than 1 day flooding',
             'recommendation': 'Areas with low susceptibility to floods are likely to experience flood heights of less than 0.5 meters and/or flood duration of less than 1 day. These include low hills and gentle slopes that have sparse to moderate drainage density.\n\nThe implementation of appropriate mitigation measures as deemed necessary by project engineers and LGU building officials is recommended for areas that are susceptible to various flood depths. Site-specific studies including the assessment for other types of hazards should also be conducted to address potential foundation problems.'
         },
         'MF': {
             'label': 'Moderate Susceptibility; 0.5 to 1 meter flood height and/or 1 to 3 days flooding',
             'class': 'risk-moderate',
-            'assessment': 'Moderate Susceptibility; 0.5 to 1 meter flood height and/or 1 to 3 days flooding',
             'recommendation': 'Areas with moderate susceptibility to floods are likely to experience flood heights of 0.5 meters up to 1 meter and/or flood duration of 1 to 3 days. These are subject to widespread inundation during prolonged and extensive heavy rainfall or extreme weather conditions. Fluvial terraces, alluvial fans, and infilled valleys are also moderately subjected to flooding.\n\nThe implementation of appropriate mitigation measures as deemed necessary by project engineers and LGU building officials is recommended for areas that are susceptible to various flood depths. Site-specific studies including the assessment for other types of hazards should also be conducted to address potential foundation problems.'
         },
         'HF': {
             'label': 'High Susceptibility; 1 to 2 meters flood height and/or more than 3 days flooding',
             'class': 'risk-high',
-            'assessment': 'High Susceptibility; 1 to 2 meters flood height and/or more than 3 days flooding',
             'recommendation': 'Areas with high susceptibility to floods are likely to experience flood heights of 1 meter up to 2 meters and/or flood duration of more than 3 days. Sites including active river channels, abandoned river channels, and areas along riverbanks, are immediately flooded during heavy rains of several hours and are prone to flash floods. These may be considered not suitable for permanent habitation but may be developed for alternative uses subject to the implementation of appropriate mitigation measures after conducting site-specific geotechnical studies as deemed necessary by project engineers and LGU building officials.\n\nThe implementation of appropriate mitigation measures as deemed necessary by project engineers and LGU building officials is recommended for areas that are susceptible to various flood depths. Site-specific studies including the assessment for other types of hazards should also be conducted to address potential foundation problems.'
         },
         'VHF': {
             'label': 'Very High Susceptibility; more than 2 meters flood height and/or more than 3 days flooding',
             'class': 'risk-very-high',
-            'assessment': 'Very High Susceptibility; more than 2 meters flood height and/or more than 3 days flooding',
             'recommendation': 'Areas with very high susceptibility to floods are likely to experience flood heights of greater than 2 meters and/or flood duration of more than 3 days. These include active river channels, abandoned river channels, and areas along riverbanks, which are immediately flooded during heavy rains of several hours and are prone to flash floods. These are considered critical geohazard areas and are not suitable for development. It is recommended that these be declared as "No Habitation/No Build Zones" by the LGU, and that affected households/communities be relocated.\n\nThe implementation of appropriate mitigation measures as deemed necessary by project engineers and LGU building officials is recommended for areas that are susceptible to various flood depths. Site-specific studies including the assessment for other types of hazards should also be conducted to address potential foundation problems.'
         }
     }
@@ -111,7 +150,6 @@ def report_view(request):
     current_risk = risk_data.get(risk_code, {
         'label': 'Unknown Risk Level',
         'class': '',
-        'assessment': 'No risk data available',
         'recommendation': 'Please conduct a proper assessment.'
     })
     
@@ -135,7 +173,7 @@ def report_view(request):
         'risk_code': risk_code,
         'risk_label': current_risk['label'],
         'risk_class': current_risk['class'],
-        'assessment_text': current_risk['assessment'],
+        'assessment_text': assessment_text,
         'recommendation_text': current_risk['recommendation'],
         'current_date': current_date,
     }
@@ -145,10 +183,11 @@ def report_view(request):
 @login_required
 def certificate_form_view(request):
     # Get parameters from URL
-    barangay = request.GET.get('barangay', 'Unknown')
     latitude = request.GET.get('lat', '0.000000')
     longitude = request.GET.get('lon', '0.000000')
-    risk_code = request.GET.get('risk', 'Unknown')
+    
+    # SECURITY: Validate coordinates and risk server-side
+    risk_code, assessment_text, barangay = get_risk_data_from_coords(latitude, longitude)
     
     # Map risk codes to full susceptibility text
     risk_mapping = {
@@ -256,20 +295,11 @@ def save_assessment(request):
     from django.http import JsonResponse
     
     if request.method == 'POST':
-        barangay = request.POST.get('barangay', 'Unknown')
         latitude = request.POST.get('latitude', '0.000000')
         longitude = request.POST.get('longitude', '0.000000')
-        flood_risk_code = request.POST.get('flood_risk_code', 'Unknown')
         
-        # Map risk codes to descriptions
-        risk_descriptions = {
-            'LF': 'Low Flood Susceptibility',
-            'MF': 'Moderate Flood Susceptibility',
-            'HF': 'High Flood Susceptibility',
-            'VHF': 'Very High Flood Susceptibility'
-        }
-        
-        flood_risk_description = risk_descriptions.get(flood_risk_code, 'Unknown')
+        # SECURITY: Validate coordinates and risk server-side
+        flood_risk_code, flood_risk_description, barangay = get_risk_data_from_coords(latitude, longitude)
         
         # Save assessment record
         assessment = AssessmentRecord.objects.create(

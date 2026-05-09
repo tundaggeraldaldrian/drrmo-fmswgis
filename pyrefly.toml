@@ -1,0 +1,6 @@
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]
+python-interpreter-path = "/home/agt/Projects/drrmo-fmswgis/env-drrmo/bin/python"
+site-package-path = ["/home/agt/Projects/drrmo-fmswgis/env-drrmo/lib/python3.12/site-packages"]
