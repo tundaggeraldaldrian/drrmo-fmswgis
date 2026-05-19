@@ -4,6 +4,16 @@ from django.contrib.auth.decorators import login_required
 from .models import Barangay, FloodSusceptibility, AssessmentRecord, ReportRecord, CertificateRecord, FloodRecordActivity
 from users.models import UserLog
 from datetime import datetime
+import io
+import os
+from django.conf import settings
+from django.http import HttpResponse, JsonResponse
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 
 try:
     from . import export_utils
@@ -166,19 +176,278 @@ def report_view(request):
     # Format current date
     current_date = datetime.now().strftime('%d %B %Y, %I:%M %p')
     
-    context = {
-        'barangay': barangay,
-        'latitude': latitude,
-        'longitude': longitude,
-        'risk_code': risk_code,
-        'risk_label': current_risk['label'],
-        'risk_class': current_risk['class'],
-        'assessment_text': assessment_text,
-        'recommendation_text': current_risk['recommendation'],
-        'current_date': current_date,
-    }
+    # Create the in-memory PDF buffer
+    buffer = io.BytesIO()
     
-    return render(request, 'maps/report.html', context)
+    # Page setup - A4 size in portrait orientation
+    # A4: 595.27 x 841.89 points
+    # Printable area: width = 595 - 72 = 523 points
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=36,
+        rightMargin=36,
+        topMargin=125,
+        bottomMargin=60
+    )
+    
+    # Custom watermark and page template routine
+    def add_watermark_and_header(canvas, doc_template):
+        canvas.saveState()
+        page_width, page_height = A4
+        
+        # 1. Draw Official Header Banner (100% scaled to margins)
+        header_path = os.path.join(settings.BASE_DIR, 'silay_drrmo/static/images/drrmo_header.png')
+        if os.path.exists(header_path):
+            try:
+                header_height = 80
+                canvas.drawImage(header_path, 36, page_height - 36 - header_height, 
+                                 width=page_width - 72, height=header_height, 
+                                 preserveAspectRatio=True, mask='auto')
+            except Exception:
+                pass
+                
+        # 2. Draw Subtle Circular Watermark Logo
+        logo_path = os.path.join(settings.BASE_DIR, 'silay_drrmo/static/images/drrmo_logo.png')
+        if os.path.exists(logo_path):
+            try:
+                watermark_size = 280
+                x_pos = (page_width - watermark_size) / 2
+                y_pos = (page_height - watermark_size) / 2
+                
+                canvas.saveState()
+                canvas.setFillAlpha(0.04)  # very subtle faded transparency
+                canvas.drawImage(logo_path, x_pos, y_pos, 
+                                 width=watermark_size, height=watermark_size, 
+                                 preserveAspectRatio=True, mask='auto')
+                canvas.restoreState()
+            except Exception:
+                pass
+
+        # 3. Draw Document Footer line & branding text
+        canvas.setStrokeColor(colors.HexColor('#0f172a'))
+        canvas.setLineWidth(1.5)
+        canvas.line(36, 45, page_width - 36, 45)
+        
+        canvas.setFont('Helvetica-Bold', 9)
+        canvas.setFillColor(colors.HexColor('#0f172a'))
+        footer_text = "SILAY CITY DISASTER RISK REDUCTION & MANAGEMENT COUNCIL"
+        text_width = canvas.stringWidth(footer_text, 'Helvetica-Bold', 9)
+        canvas.drawString((page_width - text_width) / 2, 30, footer_text)
+        
+        canvas.restoreState()
+
+    # Define custom formatting styles
+    styles = getSampleStyleSheet()
+    
+    meta_label_style = ParagraphStyle(
+        'MetaLabel',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor('#475569')
+    )
+    
+    meta_val_style = ParagraphStyle(
+        'MetaValue',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9.5,
+        leading=12,
+        textColor=colors.HexColor('#0f172a')
+    )
+    
+    meta_mono_style = ParagraphStyle(
+        'MetaMono',
+        parent=styles['Normal'],
+        fontName='Courier-Bold',
+        fontSize=9.5,
+        leading=12,
+        textColor=colors.HexColor('#0f172a')
+    )
+    
+    title_style = ParagraphStyle(
+        'ReportTitle',
+        fontName='Helvetica-Bold',
+        fontSize=13,
+        leading=17,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#0f172a'),
+        spaceBefore=15,
+        spaceAfter=15,
+    )
+    
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        fontName='Helvetica-Bold',
+        fontSize=9.5,
+        leading=13,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#1e293b')
+    )
+    
+    table_body_center_style = ParagraphStyle(
+        'TableBodyCenter',
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=14,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#0f172a')
+    )
+    
+    table_body_justify_style = ParagraphStyle(
+        'TableBodyJustify',
+        fontName='Helvetica',
+        fontSize=9,
+        leading=13,
+        alignment=TA_JUSTIFY,
+        textColor=colors.HexColor('#1e293b')
+    )
+    
+    # Styled severity-coded hazard text ratings
+    risk_lf_style = ParagraphStyle(
+        'RiskLF', fontName='Helvetica-Bold', fontSize=10, leading=14, alignment=TA_CENTER, textColor=colors.HexColor('#059669')
+    )
+    risk_mf_style = ParagraphStyle(
+        'RiskMF', fontName='Helvetica-Bold', fontSize=10, leading=14, alignment=TA_CENTER, textColor=colors.HexColor('#d97706')
+    )
+    risk_hf_style = ParagraphStyle(
+        'RiskHF', fontName='Helvetica-Bold', fontSize=10, leading=14, alignment=TA_CENTER, textColor=colors.HexColor('#dc2626')
+    )
+    risk_vhf_style = ParagraphStyle(
+        'RiskVHF', fontName='Helvetica-Bold', fontSize=10, leading=14, alignment=TA_CENTER, textColor=colors.HexColor('#991b1b')
+    )
+    
+    risk_style_map = {
+        'LF': risk_lf_style,
+        'MF': risk_mf_style,
+        'HF': risk_hf_style,
+        'VHF': risk_vhf_style
+    }
+    selected_risk_style = risk_style_map.get(risk_code, risk_lf_style)
+    
+    disc_header_style = ParagraphStyle(
+        'DiscHeader',
+        fontName='Helvetica-Bold',
+        fontSize=9.5,
+        leading=14,
+        textColor=colors.HexColor('#0f172a'),
+        spaceBefore=15,
+        spaceAfter=5
+    )
+    
+    disc_note_style = ParagraphStyle(
+        'DiscNote',
+        fontName='Helvetica-BoldOblique',
+        fontSize=9,
+        leading=13,
+        textColor=colors.HexColor('#475569'),
+        spaceAfter=8
+    )
+    
+    disc_bullet_style = ParagraphStyle(
+        'DiscBullet',
+        fontName='Helvetica',
+        fontSize=8,
+        leading=11.5,
+        textColor=colors.HexColor('#475569'),
+        leftIndent=15,
+        firstLineIndent=-10,
+        spaceAfter=6
+    )
+    
+    story = []
+    
+    story.append(Spacer(1, 10))
+    
+    # Render Metadata Table
+    meta_data = [
+        [
+            Paragraph("DATE GENERATED:", meta_label_style),
+            Paragraph(current_date, meta_val_style),
+            Paragraph("ADMINISTRATIVE AREA:", meta_label_style),
+            Paragraph(f"Barangay {barangay}, Silay City", meta_val_style),
+        ],
+        [
+            Paragraph("LATITUDE:", meta_label_style),
+            Paragraph(f"{latitude}° N", meta_mono_style),
+            Paragraph("LONGITUDE:", meta_label_style),
+            Paragraph(f"{longitude}° E", meta_mono_style),
+        ]
+    ]
+    meta_table = Table(meta_data, colWidths=[110, 150, 130, 133])
+    meta_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f8fafc')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('LEFTPADDING', (0,0), (-1,-1), 10),
+        ('RIGHTPADDING', (0,0), (-1,-1), 10),
+        ('LINEBELOW', (0,0), (-1,0), 0.5, colors.HexColor('#e2e8f0')),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#cbd5e1')),
+    ]))
+    story.append(meta_table)
+    
+    story.append(Paragraph("HYDRO-METEOROLOGICAL HAZARDS ASSESSMENT", title_style))
+    
+    # Formatted recommendation spacing
+    formatted_rec = current_risk['recommendation'].replace('\n\n', '<br/><br/>')
+    
+    # Render Hazard Assessment Table
+    table_data = [
+        [
+            Paragraph("<b>HAZARD</b>", table_header_style),
+            Paragraph("<b>ASSESSMENT</b>", table_header_style),
+            Paragraph("<b>EXPLANATION AND RECOMMENDED MITIGATION</b>", table_header_style)
+        ],
+        [
+            Paragraph("<font color='#2563eb'><b>Flood Hazard</b></font>", table_body_center_style),
+            Paragraph(current_risk['label'], selected_risk_style),
+            Paragraph(formatted_rec, table_body_justify_style)
+        ]
+    ]
+    
+    assessment_table = Table(table_data, colWidths=[90, 160, 273])
+    assessment_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f1f5f9')),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+        ('VALIGN', (0,0), (-1,0), 'MIDDLE'),
+        ('VALIGN', (0,1), (0,1), 'MIDDLE'),
+        ('VALIGN', (1,1), (1,1), 'MIDDLE'),
+        ('VALIGN', (2,1), (2,1), 'TOP'),
+        ('GRID', (0,0), (-1,-1), 1.5, colors.HexColor('#0f172a')),
+        ('TOPPADDING', (0,0), (-1,-1), 12),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 12),
+        ('LEFTPADDING', (0,0), (-1,-1), 12),
+        ('RIGHTPADDING', (0,0), (-1,-1), 12),
+    ]))
+    story.append(assessment_table)
+    
+    # Render Guidelines & Bulleted Disclaimers
+    story.append(Paragraph("Explanation and Recommendation Guidelines:", disc_header_style))
+    story.append(Paragraph("Note:", disc_note_style))
+    
+    bullet_points = [
+        "All hazard assessments are based on the available susceptibility maps and the coordinates of the user's selected location.",
+        "Depending on the basemaps used and methods employed during mapping, discrepancies may be observed between location of hazards or exposure information and actual ground observations.",
+        "In some areas, hazard assessment may be updated as new data become available for interpretation or as a result of major topographic changes due to onset of natural events.",
+        "The possibility of both rain-induced landslide and flooding occurring is not disregarded. Because of the composite nature of MGB's 1:10,000-scale Rain-induced Landslide and Flood Susceptibility Maps, it spatially prioritizes the more frequently occurring and most damaging hazards in an area. Continuous updating is being done.",
+        "For site-specific evaluation or construction of critical facilities, detailed engineering assessment and onsite geotechnical engineering survey may be required."
+    ]
+    
+    for bp in bullet_points:
+        story.append(Paragraph(f"• &nbsp; {bp}", disc_bullet_style))
+        
+    doc.build(story, onFirstPage=add_watermark_and_header)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+    
+    # Direct stream PDF response to open natively in the browser
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    filename = f"SCDRRMO_Assessment_{longitude}_{latitude}.pdf"
+    response['Content-Disposition'] = f'inline; filename="{filename}"'
+    return response
 
 @login_required
 def certificate_form_view(request):
@@ -325,23 +594,10 @@ def certificate_view(request):
                 is_suitable=is_suitable
             )
             
-            context = {
-                'barangay': barangay.upper(),
-                'purok_name': purok_name.upper(),
-                'flood_susceptibility': flood_susceptibility,
-                'incident_record': incident_record,
-                'flood_description': flood_description,
-                'suitability_status': suitability_status,
-                'intended_purpose': intended_purpose.upper(),
-                'issue_date': issue_date,
-                'prepared_by_name': prepared_by_name.upper(),
-                'prepared_by_title': prepared_by_title,
-                'signatory_name': signatory_name,
-                'signatory_title': signatory_title,
-                'signatory_subtitle': signatory_subtitle,
-            }
-            
-            return render(request, 'maps/special_certificate.html', context)
+            # Dynamic PDF Setup - Special Certificate
+            purok_name_up = purok_name.upper()
+            barangay_up = barangay.upper()
+            intended_purpose_up = intended_purpose.upper()
             
         else:
             # Process STANDARD Certificate
@@ -366,21 +622,280 @@ def certificate_view(request):
                 issue_date=issue_date
             )
             
-            context = {
-                'establishment_name': establishment_name,
-                'owner_name': owner_name,
-                'location': location,
-                'barangay': barangay.upper(),
-                'flood_susceptibility': flood_susceptibility,
-                'zone_status': zone_status,
-                'issue_date': issue_date,
-                'signatory_name': signatory_name,
-                'signatory_title': signatory_title,
-                'signatory_subtitle': signatory_subtitle,
-                'mitigating_measures_value': mitigating_measures_value,
-            }
+            barangay_up = barangay.upper()
             
-            return render(request, 'maps/certificate.html', context)
+        # RENDER REAL A4 REPORTLAB PDF STREAM
+        buffer = io.BytesIO()
+        
+        # A4 coordinates: 595.27 x 841.89 points
+        # Printable area: width = 595.27 - 108 = 487.27 points
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            leftMargin=54,
+            rightMargin=54,
+            topMargin=120,
+            bottomMargin=54
+        )
+        
+        def add_watermark_and_header(canvas, doc_template):
+            canvas.saveState()
+            page_width, page_height = A4
+            
+            # 1. Draw Official Header Banner (100% scaled to margins)
+            header_path = os.path.join(settings.BASE_DIR, 'silay_drrmo/static/images/drrmo_header.png')
+            if os.path.exists(header_path):
+                try:
+                    header_height = 80
+                    canvas.drawImage(header_path, 54, page_height - 36 - header_height, 
+                                     width=page_width - 108, height=header_height, 
+                                     preserveAspectRatio=True, mask='auto')
+                except Exception:
+                    pass
+                    
+            # 2. Draw Subtle Circular Watermark Logo
+            logo_path = os.path.join(settings.BASE_DIR, 'silay_drrmo/static/images/drrmo_logo.png')
+            if os.path.exists(logo_path):
+                try:
+                    watermark_size = 280
+                    x_pos = (page_width - watermark_size) / 2
+                    y_pos = (page_height - watermark_size) / 2
+                    
+                    canvas.saveState()
+                    canvas.setFillAlpha(0.03)  # very subtle faded transparency
+                    canvas.drawImage(logo_path, x_pos, y_pos, 
+                                     width=watermark_size, height=watermark_size, 
+                                     preserveAspectRatio=True, mask='auto')
+                    canvas.restoreState()
+                except Exception:
+                    pass
+
+            # 3. Draw Document Footer line & branding text
+            canvas.setStrokeColor(colors.black)
+            canvas.setLineWidth(1.5)
+            canvas.line(54, 55, page_width - 54, 55)
+            
+            canvas.setFont('Helvetica-Bold', 9)
+            canvas.setFillColor(colors.black)
+            footer_text = "SILAY CITY DISASTER RISK REDUCTION & MANAGEMENT COUNCIL"
+            text_width = canvas.stringWidth(footer_text, 'Helvetica-Bold', 9)
+            canvas.drawString((page_width - text_width) / 2, 40, footer_text)
+            
+            canvas.restoreState()
+
+        # Custom Typography and Paragraph styles using ReportLab Times Roman defaults
+        styles = getSampleStyleSheet()
+        
+        cert_title_style = ParagraphStyle(
+            'CertTitle',
+            fontName='Times-Bold',
+            fontSize=22,
+            leading=26,
+            alignment=TA_CENTER,
+            spaceAfter=20,
+            spaceBefore=10
+        )
+        
+        cert_body_style = ParagraphStyle(
+            'CertBody',
+            fontName='Times-Roman',
+            fontSize=12.5,
+            leading=18,
+            alignment=TA_JUSTIFY,
+            firstLineIndent=45,
+            spaceAfter=10
+        )
+        
+        cert_bold_title_style = ParagraphStyle(
+            'CertBoldTitle',
+            fontName='Times-Bold',
+            fontSize=11,
+            leading=13,
+            spaceAfter=3
+        )
+        
+        cert_sig_name_style = ParagraphStyle(
+            'CertSigName',
+            fontName='Times-Bold',
+            fontSize=12,
+            leading=14,
+            spaceAfter=2
+        )
+        
+        cert_sig_title_style = ParagraphStyle(
+            'CertSigTitle',
+            fontName='Times-Italic',
+            fontSize=10.5,
+            leading=12,
+            spaceAfter=1
+        )
+
+        story = []
+        
+        # 1. Spaced title simulated for elegant certification header spacing
+        story.append(Paragraph("C E R T I F I C A T I O N", cert_title_style))
+        
+        if certificate_type == 'SPECIAL':
+            # SPECIAL Certificate Flowables
+            p1 = (
+                f"This is to certify that the area lot located at "
+                f"<b>{purok_name_up}, BARANGAY {barangay_up}, SILAY CITY</b> "
+                f"was assessed by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) "
+                f"using MGB-DENR Map and SCDRRMO - FMSWGIS."
+            )
+            story.append(Paragraph(p1, cert_body_style))
+            
+            p2 = (
+                f"<b>WHEREAS</b>, the above-mentioned lot is under "
+                f"<b>{flood_susceptibility}</b> "
+                f"as per MGB DETAILED LANDSLIDE AND FLOOD HAZARD MAP OF SILAY CITY, "
+                f"NEGROS OCCIDENTAL, PHILIPPINES."
+            )
+            story.append(Paragraph(p2, cert_body_style))
+            
+            p3 = (
+                f"<b>WHEREAS</b>, <b>{incident_record}</b> "
+                f"flooding incidents had been recorded and experienced as per record on "
+                f"historical data and past occurrences of Silay City DISASTER RISK REDUCTION "
+                f"AND MANAGEMENT OFFICE."
+            )
+            story.append(Paragraph(p3, cert_body_style))
+            
+            p4 = (
+                f"<b>WHEREFORE</b>, upon the assessment and evaluation conducted by the "
+                f"Silay City Disaster Risk Reduction and Management Office (SCDRRMO), it has been determined "
+                f"that the area lot located at <b>{purok_name_up}, BARANGAY {barangay_up}, SILAY CITY</b> "
+                f"is situated within a <b>{flood_description}</b>, "
+                f"and <b>{suitability_status}</b> for any "
+                f"<b>{intended_purpose_up}</b>."
+            )
+            story.append(Paragraph(p4, cert_body_style))
+            
+            p5 = (
+                f"THIS CERTIFICATION is issued by the undersigned as per request by the name/organization/address "
+                f"mentioned above for whatever legal purposes it may serve."
+            )
+            story.append(Paragraph(p5, cert_body_style))
+            
+            p6 = (
+                f"Issued this {issue_date}, at Silay City Disaster Risk Reduction & Management Office, "
+                f"Silay City, Philippines."
+            )
+            story.append(Paragraph(p6, cert_body_style))
+            
+            # Double signature block side-by-side (using a 3-column table to split lines)
+            signature_data = [
+                [Paragraph("<b>PREPARED BY:</b>", cert_bold_title_style), "", Paragraph("<b>CERTIFIED BY:</b>", cert_bold_title_style)],
+                ["", "", ""],
+                [Paragraph(f"<b>{prepared_by_name.upper()}</b>", cert_sig_name_style), "", Paragraph(f"<b>{signatory_name.upper()}</b>", cert_sig_name_style)],
+                [Paragraph(prepared_by_title, cert_sig_title_style), "", Paragraph(signatory_title, cert_sig_title_style)],
+                [Paragraph("Silay City DRRM Office", cert_sig_title_style), "", Paragraph(signatory_subtitle, cert_sig_title_style)]
+            ]
+            sig_table = Table(signature_data, colWidths=[220, 47, 220])
+            sig_table.setStyle(TableStyle([
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 1), (0, 1), 24),
+                ('BOTTOMPADDING', (2, 1), (2, 1), 24),
+                ('LINEBELOW', (0, 1), (0, 1), 1.5, colors.black),
+                ('LINEBELOW', (2, 1), (2, 1), 1.5, colors.black),
+                ('TOPPADDING', (0, 2), (-1, -1), 3),
+            ]))
+            
+            story.append(Spacer(1, 20))
+            story.append(KeepTogether([sig_table]))
+            
+        else:
+            # STANDARD Certificate Flowables
+            p1 = (
+                f"This is to certify that the existing establishment named "
+                f"<b>{establishment_name}</b> owned by "
+                f"<b>{owner_name}</b> located at "
+                f"<b>{location}</b>, "
+                f"<b>BARANGAY {barangay_up}, SILAY CITY</b> "
+                f"was assessed by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) "
+                f"using MGB-DENR Map and SCDRRMO - FMSWGIS."
+            )
+            story.append(Paragraph(p1, cert_body_style))
+            
+            p2 = (
+                f"<b>WHEREAS</b>, the above-mentioned lot is under "
+                f"<b>{flood_susceptibility}</b> "
+                f"as per MGB DETAILED FLOOD HAZARD MAP OF SILAY CITY, "
+                f"NEGROS OCCIDENTAL, PHILIPPINES."
+            )
+            story.append(Paragraph(p2, cert_body_style))
+            
+            if mitigating_measures_value in ['true', True, 'True']:
+                p3 = (
+                    f"<b>WHEREAS</b>, Disaster Prevention and Mitigation are being established "
+                    f"by the Silay City Disaster Risk Reduction & Management Council (SCDRRMC) to its possible hazard prone areas."
+                )
+                story.append(Paragraph(p3, cert_body_style))
+                
+                p4 = (
+                    f"<b>WHEREAS</b>, Disaster Preparedness & Awareness Seminars are being conducted "
+                    f"by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) to its surrounding communities."
+                )
+                story.append(Paragraph(p4, cert_body_style))
+                
+                p5 = (
+                    f"<b>WHEREAS</b>, a Barangay Disaster Committee has been established by the "
+                    f"Silay City Disaster Risk Reduction & Management Office (SCDRRMO), which will monitor and ensure "
+                    f"the welfare and safety of its surrounding communities."
+                )
+                story.append(Paragraph(p5, cert_body_style))
+            
+            p6 = (
+                f"<b>WHEREFORE</b>, upon assessment of the Silay City Disaster Risk Reduction & "
+                f"Management Office (SCDRRMO), the existing establishment named "
+                f"<b>{establishment_name}</b> owned by "
+                f"<b>{owner_name}</b> located at "
+                f"<b>{location}</b>, "
+                f"<b>BARANGAY {barangay_up}, SILAY CITY</b> "
+                f"is under a <u><b>{zone_status}</b></u>."
+            )
+            story.append(Paragraph(p6, cert_body_style))
+            
+            p7 = (
+                f"Issued this {issue_date}, at Silay City Disaster Risk Reduction & Management Office, "
+                f"Silay City, Philippines."
+            )
+            story.append(Paragraph(p7, cert_body_style))
+            
+            # Single right-aligned signature block
+            signature_data = [
+                ["", Paragraph("<b>CERTIFIED BY:</b>", cert_bold_title_style)],
+                ["", ""],
+                ["", Paragraph(f"<b>{signatory_name.upper()}</b>", cert_sig_name_style)],
+                ["", Paragraph(signatory_title, cert_sig_title_style)],
+                ["", Paragraph(signatory_subtitle, cert_sig_title_style)]
+            ]
+            sig_table = Table(signature_data, colWidths=[240, 247])
+            sig_table.setStyle(TableStyle([
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (1, 1), (1, 1), 24),
+                ('LINEBELOW', (1, 1), (1, 1), 1.5, colors.black),
+                ('TOPPADDING', (1, 2), (1, -1), 3),
+            ]))
+            
+            story.append(Spacer(1, 20))
+            story.append(KeepTogether([sig_table]))
+
+        # Build the document
+        doc.build(story, onFirstPage=add_watermark_and_header, onLaterPages=add_watermark_and_header)
+        
+        pdf_content = buffer.getvalue()
+        buffer.close()
+        
+        # Return as dynamic inline PDF stream!
+        filename = f"SCDRRMO_Certification_{longitude}_{latitude}.pdf"
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
 
     
     # If not POST, redirect to form

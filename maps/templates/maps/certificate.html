@@ -2,349 +2,387 @@
 <html>
 {% load static %}
 <head>
-    <title>Flood Hazard Certification</title>
+    <title>Flood Hazard Certification - Silay City DRRMO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
-        @media print {
-            @page {
-                margin: 0;
-                size: letter;
-            }
-            
-            html, body {
-                width: 8.5in;
-                height: 11in;
-                margin: 0;
-                padding: 0;
-                background: white !important;
-            }
-            
-            body {
-                display: flex !important;
-                flex-direction: column !important;
-            }
-            
-            .certificate-container {
-                margin: 0 !important;
-                padding: 0 0.5in !important;
-                max-width: 100% !important;
-                box-shadow: none !important;
-                width: 100% !important;
-                background: white !important;
-                min-height: 11in !important;
-                display: flex !important;
-                flex-direction: column !important;
-            }
-            
-            .header {
-                flex-shrink: 0;
-                margin-top: 0 !important;
-                padding-top: 0 !important;
-            }
-            
-            .header img {
-                margin-top: 0 !important;
-                padding-top: 0 !important;
-            }
-            
-            .content-wrapper {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-            }
-            
-            .main-content {
-                flex-grow: 1;
-            }
-            
-            .footer {
-                flex-shrink: 0;
-                margin-top: auto;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
-        }
-        
+        /* CSS Reset & Token Variables */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Times New Roman', Times, serif;
-            background: #1a1a1a;
-            padding: 20px;
+            background: #0f172a; /* Slate Dark Background */
             margin: 0;
-            line-height: 1.6;
+            padding: 0;
+            padding-top: 60px; /* Height of the PDF toolbar */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            overflow-y: auto;
+            color: #000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        
-        .certificate-container {
+
+        /* PDF Viewer Top Toolbar */
+        .pdf-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 850px;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            color: #f1f5f9;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .pdf-filename {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .pdf-filename i {
+            color: #ef4444; /* PDF Red */
+            font-size: 18px;
+        }
+
+        .pdf-page-indicator {
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .pdf-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .pdf-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pdf-btn.print-btn {
+            background: #2563eb;
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .pdf-btn.print-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        .pdf-btn.close-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        .pdf-btn.close-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        /* A4 Page Canvas Sheet */
+        .certificate-container {
+            width: 210mm;
+            min-height: 297mm;
             background: white;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            margin: 20px auto;
-            min-height: 11in;
+            padding: 20mm 20mm 15mm 20mm;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            margin: 40px auto;
+            position: relative;
+            box-sizing: border-box;
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
-        
+
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            margin-top: 0;
-            padding-top: 0;
+            margin-bottom: 24px;
             flex-shrink: 0;
         }
-        
+
         .header img {
             width: 100%;
-            max-width: 1150px;
-            margin-bottom: 2px;
-            margin-top: 0;
-            padding-top: 0;
+            max-width: 100%;
+            height: auto;
             display: block;
         }
-        
+
         .content-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
-        
+
         .main-content {
             flex-grow: 1;
         }
-        
+
         .title {
             text-align: center;
-            margin: 0px 0 24px 0;
+            margin: 10px 0 28px 0;
         }
-        
+
         .title h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
-            letter-spacing: 7.5px;
-            color: #999;
+            letter-spacing: 6px;
+            color: #000;
             margin: 0;
+            text-transform: uppercase;
         }
-        
+
         .content {
             text-align: justify;
             font-size: 16px;
-            line-height: 1.65;
-            margin-bottom: 0px;
+            line-height: 1.7;
+            margin-bottom: 24px;
         }
-        
+
         .content p {
             margin-bottom: 20px;
-            text-indent: 40px;
+            text-indent: 50px;
         }
-        
+
         .content p:first-child {
             margin-top: 0;
         }
-        
+
         .establishment-name, .owner-name, .location, .barangay, .hazard-level, .zone-status {
             font-weight: bold;
         }
-        
+
         .zone-status {
             text-decoration: underline;
         }
-        
+
         .whereas, .wherefore {
             font-weight: bold;
         }
-        
+
         .issued-date {
-            margin-top: 2px;
-            text-indent: 40px;
+            margin-top: 10px;
+            text-indent: 50px;
         }
-        
+
         .signature-section {
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            flex-shrink: 0;
         }
-        
+
         .signature-block {
-            text-align: center;
-        }
-        
-        .signature-block > div {
             text-align: left;
-            margin-left: 50px;
+            margin-left: auto;
+            width: 320px;
         }
-        
+
         .signature-block p {
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
-        
+
         .signature-line {
-            display: inline-block;
-            width: 280px;
+            width: 100%;
             border-bottom: 2px solid #000;
-            margin-bottom: 2px;
-            height: 32px;
+            margin-bottom: 6px;
+            height: 36px;
         }
-        
+
         .signatory-name {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 14.5px;
             text-transform: uppercase;
             margin-bottom: 1px;
         }
-        
+
         .signatory-title {
-            font-size: 12px;
+            font-size: 12.5px;
             font-style: italic;
             margin-bottom: 0px;
+            line-height: 1.4;
         }
-        
+
         .footer {
             text-align: center;
-            padding-top: 10px;
+            padding-top: 12px;
             border-top: 2px solid #000;
             flex-shrink: 0;
             margin-top: auto;
+            font-family: 'Inter', Arial, sans-serif;
         }
-        
+
         .footer p {
             font-size: 12px;
             font-weight: bold;
             margin: 0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #0f172a;
         }
-        
-        .action-buttons {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 12px;
-        }
-        
-        .print-btn, .close-btn {
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px 24px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-        }
-        
-        .print-btn {
-            background: linear-gradient(135deg, #2563eb, #1e3a5f);
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
-        }
-        
-        .print-btn:hover {
-            background: linear-gradient(135deg, #1e3a5f, #2563eb);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
-        }
-        
-        .close-btn {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
-            padding: 14px 20px;
-        }
-        
-        .close-btn:hover {
-            background: linear-gradient(135deg, #b91c1c, #dc2626);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+
+        /* A4 Print Layout Rules */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0mm; /* Full page A4 */
+            }
+
+            body {
+                background: white !important;
+                padding-top: 0 !important;
+                margin: 0 !important;
+            }
+
+            .pdf-toolbar {
+                display: none !important;
+            }
+
+            .certificate-container {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 15mm 15mm 10mm 15mm !important;
+                border: none !important;
+                border-radius: 0 !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="action-buttons no-print">
-        <button class="close-btn" onclick="window.close()">✕ Cancel</button>
-        <button class="print-btn" onclick="window.print()">🖨️ Print Certificate</button>
+    <!-- Premium PDF Viewer Top Toolbar -->
+    <div class="pdf-toolbar no-print">
+        <div class="pdf-filename">
+            <i class="fas fa-file-pdf"></i>
+            <span>Silay_DRRMO_Flood_Hazard_Certification.pdf</span>
+            <span class="pdf-page-indicator">A4 Sheet</span>
+        </div>
+        <div class="pdf-actions">
+            <button class="pdf-btn close-btn" onclick="window.close()">
+                <i class="fas fa-times"></i> Close Viewer
+            </button>
+            <button class="pdf-btn print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Certificate (A4)
+            </button>
+        </div>
     </div>
     
+    <!-- A4 Certificate Document Sheet -->
     <div class="certificate-container">
         <div class="header">
-            <img src="{% static 'images/drrmo_header.png' %}" alt="Silay DRRMO Header" style="width:100%;max-width:1050px;margin-bottom:2px;margin-top:0;display:block;">
+            <img src="{% static 'images/drrmo_header.png' %}" alt="Silay City DRRMO Header">
         </div>
         
-        <div class="title">
-            <h1>CERTIFICATION</h1>
-        </div>
-        
-        <div class="content">
-            <p>
-                This is to certify that the existing establishment named 
-                <span class="establishment-name">{{ establishment_name }}</span> owned by 
-                <span class="owner-name">{{ owner_name }}</span> located at 
-                <span class="location">{{ location }}</span>, 
-                <span class="barangay">BARANGAY {{ barangay }}, SILAY CITY</span> 
-                was assessed by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) 
-                using MGB-DENR Map and Hazard Hunter Assessment Tool.
-            </p>
+        <div class="content-wrapper">
+            <div class="main-content">
+                <div class="title">
+                    <h1>CERTIFICATION</h1>
+                </div>
+                
+                <div class="content">
+                    <p>
+                        This is to certify that the existing establishment named 
+                        <span class="establishment-name">{{ establishment_name }}</span> owned by 
+                        <span class="owner-name">{{ owner_name }}</span> located at 
+                        <span class="location">{{ location }}</span>, 
+                        <span class="barangay">BARANGAY {{ barangay }}, SILAY CITY</span> 
+                        was assessed by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) 
+                        using MGB-DENR Map and SCDRRMO - FMSWGIS.
+                    </p>
+                    
+                    <p>
+                        <span class="whereas">WHEREAS</span>, the above-mentioned lot is under 
+                        <span class="hazard-level">{{ flood_susceptibility }}</span> 
+                        as per MGB DETAILED FLOOD HAZARD MAP OF SILAY CITY, 
+                        NEGROS OCCIDENTAL, PHILIPPINES.
+                    </p>
+                    
+                    {% if mitigating_measures_value == 'true' or mitigating_measures_value == True %}
+                    <p>
+                        <span class="whereas">WHEREAS</span>, Disaster Prevention and Mitigation are being established 
+                        by the Silay City Disaster Risk Reduction & Management Council (SCDRRMC) to its possible hazard prone areas.
+                    </p>
+                    
+                    <p>
+                        <span class="whereas">WHEREAS</span>, Disaster Preparedness & Awareness Seminars are being conducted 
+                        by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) to its surrounding communities.
+                    </p>
+                    
+                    <p>
+                        <span class="whereas">WHEREAS</span>, a Barangay Disaster Committee has been established by the 
+                        Silay City Disaster Risk Reduction & Management Office (SCDRRMO), which will monitor and ensure 
+                        the welfare and safety of its surrounding communities.
+                    </p>
+                    {% endif %}
+                    
+                    <p>
+                        <span class="wherefore">WHEREFORE</span>, upon assessment of the Silay City Disaster Risk Reduction & 
+                        Management Office (SCDRRMO), the existing establishment named 
+                        <span class="establishment-name">{{ establishment_name }}</span> owned by 
+                        <span class="owner-name">{{ owner_name }}</span> located at 
+                        <span class="location">{{ location }}</span>, 
+                        <span class="barangay">BARANGAY {{ barangay }}, SILAY CITY</span> 
+                        is under a <span class="zone-status">{{ zone_status }}</span>.
+                    </p>
+                    
+                    <p class="issued-date">
+                        Issued this {{ issue_date }}, at Silay City Disaster Risk Reduction & Management Office, 
+                        Silay City, Philippines.
+                    </p>
+                </div>
+            </div>
             
-            <p>
-                <span class="whereas">WHEREAS</span>, the above-mentioned lot is under 
-                <span class="hazard-level">{{ flood_susceptibility }}</span> 
-                as per MGB DETAILED FLOOD HAZARD MAP OF SILAY CITY, 
-                NEGROS OCCIDENTAL, PHILIPPINES.
-            </p>
-            
-            {% if mitigating_measures_value == 'true' or mitigating_measures_value == True %}
-            <p>
-                <span class="whereas">WHEREAS</span>, Disaster Prevention and Mitigation are being established 
-                by the Silay City Disaster Risk Reduction & Management Council (SCDRRMC) to its possible hazard prone areas.
-            </p>
-            
-            <p>
-                <span class="whereas">WHEREAS</span>, Disaster Preparedness & Awareness Seminars are being conducted 
-                by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) to its surrounding communities.
-            </p>
-            
-            <p>
-                <span class="whereas">WHEREAS</span>, a Barangay Disaster Committee has been established by the 
-                Silay City Disaster Risk Reduction & Management Office (SCDRRMO), which will monitor and ensure 
-                the welfare and safety of its surrounding communities.
-            </p>
-            {% endif %}
-            
-            <p>
-                <span class="wherefore">WHEREFORE</span>, upon assessment of the Silay City Disaster Risk Reduction & 
-                Management Office (SCDRRMO), the existing establishment named 
-                <span class="establishment-name">{{ establishment_name }}</span> owned by 
-                <span class="owner-name">{{ owner_name }}</span> located at 
-                <span class="location">{{ location }}</span>, 
-                <span class="barangay">BARANGAY {{ barangay }}, SILAY CITY</span> 
-                is under a <span class="zone-status">{{ zone_status }}</span>.
-            </p>
-            
-            <p class="issued-date">
-                Issued this {{ issue_date }}, at Silay City Disaster Risk Reduction & Management Office, 
-                Silay City, Philippines.
-            </p>
-        </div>
-        
-        <div class="signature-section">
-            <div class="signature-block">
-                <div style="text-align: left; margin-left: 50px;">
+            <div class="signature-section">
+                <div class="signature-block">
                     <p style="font-weight: bold; margin-bottom: 5px;">CERTIFIED BY:</p>
                     <div class="signature-line"></div>
                     <p class="signatory-name">{{ signatory_name }}</p>
@@ -352,10 +390,10 @@
                     <p class="signatory-title">{{ signatory_subtitle }}</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="footer">
-            <p style="font-size:13px; font-weight:bold; margin-bottom:6px;">SILAY CITY DISASTER RISK REDUCTION &amp; MANAGEMENT COUNCIL</p>
+            
+            <div class="footer">
+                <p>SILAY CITY DISASTER RISK REDUCTION &amp; MANAGEMENT COUNCIL</p>
+            </div>
         </div>
     </div>
 </body>

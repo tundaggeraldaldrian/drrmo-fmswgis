@@ -2,372 +2,444 @@
 <html>
 {% load static %}
 <head>
-    <title>Flood Hazard Assessment Report</title>
+    <title>Flood Hazard Assessment Report - Silay City DRRMO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
-        @media print {
-            @page {
-                margin: 0mm 10mm;
-                size: letter;
-            }
-            html {
-                width: 8.5in;
-                height: 11in;
-            }
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-                display: block !important;
-            }
-            .report-container {
-                margin: 0 !important;
-                padding: 0 0.5in !important;
-                max-width: 100% !important;
-                box-shadow: none !important;
-                width: 100% !important;
-                background: white !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        @media print and (size: A4) {
-            @page {
-                size: A4;
-                margin: 0mm 10mm;
-            }
-            html {
-                width: 210mm;
-                height: 297mm;
-            }
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-                width: 210mm !important;
-                height: auto !important;
-                display: block !important;
-                line-height: 1.6 !important;
-            }
-            .report-container {
-                margin: 0 !important;
-                padding: 0 0.5in !important;
-                padding-top: 0 !important;
-                max-width: 100% !important;
-                box-shadow: none !important;
-                width: 100% !important;
-                background: white !important;
-                height: auto !important;
-                min-height: auto !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-        
+        /* CSS Reset & Variable Tokens */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', Arial, sans-serif;
-            background: #1a1a1a;
+            background: #0f172a; /* Slate Dark Background */
             margin: 0;
-            padding: 20px;
-            font-size: 14px;
+            padding: 0;
+            padding-top: 60px; /* Height of the PDF toolbar */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            overflow-y: auto;
+            color: #334155;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        
-        .report-container {
+
+        /* PDF Viewer Top Toolbar */
+        .pdf-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 850px;
-            background: white;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            margin: 20px auto;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            color: #f1f5f9;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-        
+
+        .pdf-filename {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .pdf-filename i {
+            color: #ef4444; /* PDF Red */
+            font-size: 18px;
+        }
+
+        .pdf-page-indicator {
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .pdf-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .pdf-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pdf-btn.print-btn {
+            background: #2563eb;
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .pdf-btn.print-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        .pdf-btn.close-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        .pdf-btn.close-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        /* A4 Page Canvas Sheet */
+        .report-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 20mm;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            margin: 40px auto;
+            position: relative;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        /* Document Header */
         .header {
             text-align: center;
-            margin-top: -10px;
-            margin-bottom: 20px;
-            padding-top: 0;
-            padding-bottom: 4px;
-            border-bottom: 2px solid #000;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
         }
-        
-        @media print {
-            .header {
-                margin-top: -10px !important;
-                padding-top: 0 !important;
-            }
-            .header img {
-                margin-top: 0 !important;
-                padding-top: 0 !important;
-            }
-            body {
-                padding-top: 0 !important;
-            }
-            .report-container {
-                padding-top: 0 !important;
-            }
+
+        .header-logo {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 16px;
         }
-        
-        .qr-section {
-            float: left;
-            margin-right: 20px;
-        }
-        
-        .qr-code {
-            width: 120px;
-            height: 120px;
-            border: 1px solid #ddd;
-            padding: 5px;
-        }
-        
-        .view-document {
-            font-size: 9px;
-            text-align: center;
-            margin-top: 5px;
-        }
-        
-        .header-info {
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
             text-align: left;
-            padding-top: 12px;
+            margin-top: 16px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
         }
-        
-        .header-info h3 {
-            font-size: 16px;
-            font-weight: 600;
+
+        .header-item h3 {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
             margin-bottom: 4px;
         }
-        
-        .header-info p {
-            font-size: 15px;
-            margin-bottom: 8px;
-            line-height: 1.5;
+
+        .header-item p {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #0f172a;
         }
-        
-        .title {
-            clear: both;
-            text-align: center;
-            margin: 16px 0 16px 0;
-            padding-top: 0;
-        }
-        
-        .title h1 {
-            font-size: 23px;
+
+        .header-item.coords p {
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
-        
+
+        /* Title Area */
+        .title {
+            text-align: center;
+            margin: 28px 0 20px 0;
+        }
+
+        .title h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+
+        /* Assessment Table details */
         .assessment-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
-        
+
         .assessment-table th,
         .assessment-table td {
-            border: 1px solid #000;
-            padding: 14px;
+            border: 1px solid #cbd5e1;
+            padding: 16px;
             text-align: left;
             vertical-align: top;
         }
-        
+
         .assessment-table th {
-            background-color: #f0f0f0;
-            font-weight: 600;
-            font-size: 16px;
+            background-color: #f1f5f9;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #475569;
             text-align: center;
         }
-        
+
         .assessment-table td {
-            font-size: 15px;
-            line-height: 1.7;
+            font-size: 13.5px;
+            line-height: 1.6;
         }
-        
+
         .hazard-col {
-            width: 15%;
+            width: 18%;
             text-align: center;
-            font-weight: 500;
+            font-weight: 700;
+            color: #0f172a;
         }
-        
+
         .assessment-col {
-            width: 30%;
+            width: 32%;
         }
-        
+
         .explanation-col {
-            width: 55%;
+            width: 50%;
         }
-        
-        .risk-level {
-            font-weight: 600;
-            font-size: 16px;
+
+        .risk-level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 10px;
         }
-        
-        .risk-low { color: #059669; }
-        .risk-moderate { color: #d97706; }
-        .risk-high { color: #dc2626; }
-        .risk-very-high { color: #991b1b; }
-        
+
+        .risk-level-badge.risk-low {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .risk-level-badge.risk-moderate {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .risk-level-badge.risk-high {
+            background: rgba(239, 68, 68, 0.12);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .risk-level-badge.risk-very-high {
+            background: rgba(153, 27, 27, 0.12);
+            color: #991b1b;
+            border: 1px solid rgba(153, 27, 27, 0.2);
+        }
+
+        .assessment-details-text {
+            font-weight: 500;
+            color: #475569;
+        }
+
+        /* Recommendations Section */
         .explanation-section {
-            margin-top: 8px;
+            margin-top: 24px;
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
         }
-        
+
         .explanation-section h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .explanation-section h4 {
-            font-size: 15px;
-            font-weight: 600;
-            margin: 10px 0 8px 0;
-        }
-        
-        .explanation-section ul {
-            margin-left: 20px;
             font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .explanation-section ul li {
-            margin-bottom: 10px;
-        }
-        
-        .action-buttons {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 12px;
-        }
-        
-        .print-btn {
-            background: linear-gradient(135deg, #2563eb, #1e3a5f);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
-            font-family: inherit;
-            transition: all 0.2s ease;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        .print-btn:hover {
-            background: linear-gradient(135deg, #1e3a5f, #2563eb);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+
+        .explanation-section h3 i {
+            color: #3b82f6;
         }
-        
-        .close-btn {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
-            font-family: inherit;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+
+        .explanation-section ul {
+            margin-left: 20px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #475569;
         }
-        
-        .close-btn:hover {
-            background: linear-gradient(135deg, #b91c1c, #dc2626);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+
+        .explanation-section ul li {
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-        
-        .note-text {
-            font-style: italic;
-            color: #666;
-            font-size: 10px;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .action-buttons {
-                flex-direction: column;
-                right: 10px;
-                top: 10px;
+
+        /* A4 Print Layout Rules */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0mm; /* Full page canvas, padding handled by container */
+            }
+
+            body {
+                background: white !important;
+                padding-top: 0 !important;
+                margin: 0 !important;
+            }
+
+            .pdf-toolbar {
+                display: none !important;
+            }
+
+            .report-container {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 15mm !important;
+                border: none !important;
+                border-radius: 0 !important;
             }
         }
     </style>
 </head>
 <body>
-    <div class="action-buttons no-print">
-        <button class="close-btn" onclick="window.close()">✕ Close</button>
-        <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+    <!-- Premium PDF Viewer Top Toolbar -->
+    <div class="pdf-toolbar no-print">
+        <div class="pdf-filename">
+            <i class="fas fa-file-pdf"></i>
+            <span>Silay_DRRMO_Flood_Assessment_Report.pdf</span>
+            <span class="pdf-page-indicator">A4 Sheet</span>
+        </div>
+        <div class="pdf-actions">
+            <button class="pdf-btn close-btn" onclick="window.close()">
+                <i class="fas fa-times"></i> Close Viewer
+            </button>
+            <button class="pdf-btn print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Assessment (A4)
+            </button>
+        </div>
     </div>
     
+    <!-- A4 Document Page Sheet -->
     <div class="report-container">
+        <!-- Logo & Header details -->
         <div class="header">
-            <img src="{% static 'images/drrmo_header.png' %}" alt="Silay DRRMO Header" style="width:100%;max-width:1350px;margin-bottom:20px;margin-top:0;display:block;">
-            <div class="header-info">
-                <h3>DATE</h3>
-                <p>{{ current_date }}</p>
-                <h3>LOCATION</h3>
-                <p>Silay City, Negros Occidental</p>
-                <h3>COORDINATES</h3>
-                <p>{{ longitude }}, {{ latitude }}</p>
+            <img class="header-logo" src="{% static 'images/drrmo_header.png' %}" alt="Silay City DRRMO Header">
+            
+            <div class="header-grid">
+                <div class="header-item">
+                    <h3>Date Generated</h3>
+                    <p>{{ current_date }}</p>
+                </div>
+                <div class="header-item">
+                    <h3>Administrative Area</h3>
+                    <p>Barangay {{ barangay }}, Silay City</p>
+                </div>
+                <div class="header-item coords">
+                    <h3>Latitude Coordinates</h3>
+                    <p>{{ latitude }}° N</p>
+                </div>
+                <div class="header-item coords">
+                    <h3>Longitude Coordinates</h3>
+                    <p>{{ longitude }}° E</p>
+                </div>
             </div>
         </div>
         
+        <!-- Document Title -->
         <div class="title">
-            <h1>HYDRO-METEOROLOGICAL HAZARDS ASSESSMENT</h1>
+            <h1>Hydro-Meteorological Hazards Assessment</h1>
         </div>
         
+        <!-- Spatial Hazard Table details -->
         <table class="assessment-table">
             <thead>
                 <tr>
                     <th class="hazard-col">HAZARD</th>
-                    <th class="assessment-col">ASSESSMENT</th>
-                    <th class="explanation-col">EXPLANATION AND RECOMMENDATION</th>
+                    <th class="assessment-col">SUSCEPTIBILITY</th>
+                    <th class="explanation-col">EXPLANATION AND RECOMMENDED MITIGATION</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="hazard-col">Flood</td>
-                    <td class="assessment-col">
-                        <span class="risk-level {{ risk_class }}">{{ risk_label }}</span>
-                        <p style="margin-top: 10px; font-size: 13px;">{{ assessment_text }}</p>
+                    <td class="hazard-col">
+                        <i class="fas fa-cloud-showers-heavy" style="color: #3b82f6; display: block; font-size: 24px; margin-bottom: 8px;"></i>
+                        Flood Hazard
                     </td>
-                    <td class="explanation-col">{{ recommendation_text }}</td>
+                    <td class="assessment-col">
+                        <span class="risk-level-badge {{ risk_class }}">
+                            <i class="fas fa-exclamation-triangle"></i> {{ risk_label }}
+                        </span>
+                        <div class="assessment-details-text">{{ assessment_text }}</div>
+                    </td>
+                    <td class="explanation-col" style="font-weight: 500; color: #334155;">
+                        {{ recommendation_text }}
+                    </td>
                 </tr>
             </tbody>
         </table>
         
+        <!-- Administrative Notice / Explanations -->
         <div class="explanation-section">
-            <h3>Explanation and Recommendation:</h3>
-            <h4>Note:</h4>
+            <h3><i class="fas fa-info-circle"></i> Assessment Guidelines & Disclaimers</h3>
             <ul>
-                <li>All hazard assessments are based on the available susceptibility maps and the coordinates of the user's selected location.</li>
+                <li>All hazard assessments are based on the available GIS susceptibility maps and the coordinates of the user's selected location.</li>
                 <li>Depending on the basemaps used and methods employed during mapping, discrepancies may be observed between location of hazards or exposure information and actual ground observations.</li>
-                <li>In some areas, hazard assessment may be updated as new data become available for interpretation or as a result of major topographic changes due to onset of natural events.</li>
-                <li>The possibility of both rain-induced landslide and flooding occurring is not disregarded. Because of the composite nature of MGB's 1:10,000-scale Rain-induced Landslide and Flood Susceptibility Maps, it spatially prioritizes the more frequently occurring and most damaging hazards in an area. Continuous updating is being done.</li>
+                <li>In some areas, hazard assessment may be updated as new data become available for interpretation or as a result of major topographic changes due to natural events.</li>
+                <li>The possibility of both rain-induced landslide and flooding occurring is not disregarded. Because of the composite nature of MGB's 1:10,000-scale maps, it spatially prioritizes the more frequently occurring and most damaging hazards in an area.</li>
                 <li>For site-specific evaluation or construction of critical facilities, detailed engineering assessment and onsite geotechnical engineering survey may be required.</li>
             </ul>
         </div>
