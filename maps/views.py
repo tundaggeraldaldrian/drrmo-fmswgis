@@ -236,55 +236,152 @@ def certificate_form_view(request):
 @login_required
 def certificate_view(request):
     if request.method == 'POST':
-        # Get form data
-        establishment_name = request.POST.get('establishment_name', '')
-        owner_name = request.POST.get('owner_name', '')
-        location = request.POST.get('location', '')
-        barangay = request.POST.get('barangay', 'Unknown')
-        zone_status = request.POST.get('zone_status', '')
-        issue_date = request.POST.get('issue_date', '')
-        signatory_name = request.POST.get('signatory_name', '')
-        signatory_title = request.POST.get('signatory_title', '')
-        signatory_subtitle = request.POST.get('signatory_subtitle', '')
+        from django.conf import settings
         
-        # Get assessment data from hidden fields
+        # Get common form data and sanitize
+        certificate_type = request.POST.get('certificate_type', 'STANDARD')
+        location = escape(request.POST.get('location', ''))
         latitude = request.POST.get('latitude', '0.000000')
         longitude = request.POST.get('longitude', '0.000000')
-        flood_susceptibility = request.POST.get('flood_susceptibility', 'Unknown')
-        risk_code = request.POST.get('risk_code', 'Unknown')
         
-        # Get mitigating measures value from hidden field
-        mitigating_measures_value = request.POST.get('mitigating_measures_value', 'false')
+        # SECURITY: Re-calculate risk and barangay server-side to prevent tampering
+        risk_code, assessment_text, barangay = get_risk_data_from_coords(latitude, longitude)
         
-        # Save certificate generation record
-        CertificateRecord.objects.create(
-            user=request.user,
-            establishment_name=establishment_name,
-            owner_name=owner_name,
-            location=location,
-            barangay=barangay,
-            latitude=latitude,
-            longitude=longitude,
-            flood_susceptibility=flood_susceptibility,
-            zone_status=zone_status,
-            issue_date=issue_date
-        )
+        # SECURITY: Use signatory details from settings instead of POST
+        signatory_name = getattr(settings, 'CERTIFICATE_SIGNATORY_NAME', 'P/SUPT. ALEXANDER A. MUÑOZ (RET.)')
+        signatory_title = getattr(settings, 'CERTIFICATE_SIGNATORY_TITLE', 'DRRMO Officer IV')
+        signatory_subtitle = getattr(settings, 'CERTIFICATE_SIGNATORY_SUBTITLE', 'Secretariat, SCDRRMC')
         
-        context = {
-            'establishment_name': establishment_name,
-            'owner_name': owner_name,
-            'location': location,
-            'barangay': barangay.upper(),
-            'flood_susceptibility': flood_susceptibility,
-            'zone_status': zone_status,
-            'issue_date': issue_date,
-            'signatory_name': signatory_name,
-            'signatory_title': signatory_title,
-            'signatory_subtitle': signatory_subtitle,
-            'mitigating_measures_value': mitigating_measures_value,
+        # Map risk codes to full susceptibility text and zone status
+        risk_mapping = {
+            'LF': 'LOW FLOOD SUSCEPTIBILITY',
+            'MF': 'MODERATE FLOOD SUSCEPTIBILITY',
+            'HF': 'HIGH FLOOD SUSCEPTIBILITY',
+            'VHF': 'VERY HIGH FLOOD SUSCEPTIBILITY'
         }
         
-        return render(request, 'maps/certificate.html', context)
+        zone_mapping = {
+            'LF': 'SAFE ZONE',
+            'MF': 'CONTROLLED ZONE',
+            'HF': 'CRITICAL ZONE',
+            'VHF': 'NO HABITATION/BUILD ZONE'
+        }
+        
+        flood_susceptibility = risk_mapping.get(risk_code, 'UNKNOWN FLOOD SUSCEPTIBILITY')
+        zone_status = zone_mapping.get(risk_code, 'UNKNOWN ZONE')
+        
+        # Generate current date with proper suffix
+        from datetime import datetime
+        today = datetime.now()
+        day = today.day
+        
+        if 4 <= day <= 20 or 24 <= day <= 30:
+            suffix = "th"
+        else:
+            suffix = ["st", "nd", "rd"][day % 10 - 1]
+        
+        issue_date = f"{day}{suffix} of {today.strftime('%B %Y')}"
+        
+        if certificate_type == 'SPECIAL':
+            # Process SPECIAL Certification
+            purok_name = escape(request.POST.get('purok_name', ''))
+            incident_record = escape(request.POST.get('incident_record', 'SEVERAL'))
+            intended_purpose = escape(request.POST.get('intended_purpose', ''))
+            
+            # Suitability logic: HF and VHF are typically NOT SUITABLE
+            is_suitable = risk_code not in ['HF', 'VHF']
+            suitability_status = "SUITABLE" if is_suitable else "NOT SUITABLE"
+            
+            # Map risk codes to special descriptions for the summary paragraph
+            desc_mapping = {
+                'LF': 'Low Flood-Prone Area',
+                'MF': 'Moderate Flood-Prone Area',
+                'HF': 'High Flood-Prone Area and High-Risk Area',
+                'VHF': 'Very High Flood-Prone Area and High-Risk Area'
+            }
+            flood_description = desc_mapping.get(risk_code, 'Flood-Prone Area')
+            
+            # Signatories: "Prepared By" comes from the current logged-in user
+            prepared_by_name = request.user.get_full_name() or request.user.username
+            prepared_by_title = request.user.position if hasattr(request.user, 'position') else "Staff Member"
+            # Get human-readable position if choices are used
+            if hasattr(request.user, 'get_position_display'):
+                prepared_by_title = request.user.get_position_display()
+
+            # Save Special Certificate record
+            CertificateRecord.objects.create(
+                user=request.user,
+                certificate_type='SPECIAL',
+                location=location,
+                barangay=barangay,
+                latitude=latitude,
+                longitude=longitude,
+                flood_susceptibility=flood_susceptibility,
+                zone_status=zone_status,
+                issue_date=issue_date,
+                purok_name=purok_name,
+                incident_record=incident_record,
+                intended_purpose=intended_purpose,
+                is_suitable=is_suitable
+            )
+            
+            context = {
+                'barangay': barangay.upper(),
+                'purok_name': purok_name.upper(),
+                'flood_susceptibility': flood_susceptibility,
+                'incident_record': incident_record,
+                'flood_description': flood_description,
+                'suitability_status': suitability_status,
+                'intended_purpose': intended_purpose.upper(),
+                'issue_date': issue_date,
+                'prepared_by_name': prepared_by_name.upper(),
+                'prepared_by_title': prepared_by_title,
+                'signatory_name': signatory_name,
+                'signatory_title': signatory_title,
+                'signatory_subtitle': signatory_subtitle,
+            }
+            
+            return render(request, 'maps/special_certificate.html', context)
+            
+        else:
+            # Process STANDARD Certificate
+            establishment_name = escape(request.POST.get('establishment_name', ''))
+            owner_name = escape(request.POST.get('owner_name', ''))
+            
+            # Get mitigating measures value from hidden field
+            mitigating_measures_value = request.POST.get('mitigating_measures_value', 'false')
+            
+            # Save Standard Certificate record
+            CertificateRecord.objects.create(
+                user=request.user,
+                certificate_type='STANDARD',
+                establishment_name=establishment_name,
+                owner_name=owner_name,
+                location=location,
+                barangay=barangay,
+                latitude=latitude,
+                longitude=longitude,
+                flood_susceptibility=flood_susceptibility,
+                zone_status=zone_status,
+                issue_date=issue_date
+            )
+            
+            context = {
+                'establishment_name': establishment_name,
+                'owner_name': owner_name,
+                'location': location,
+                'barangay': barangay.upper(),
+                'flood_susceptibility': flood_susceptibility,
+                'zone_status': zone_status,
+                'issue_date': issue_date,
+                'signatory_name': signatory_name,
+                'signatory_title': signatory_title,
+                'signatory_subtitle': signatory_subtitle,
+                'mitigating_measures_value': mitigating_measures_value,
+            }
+            
+            return render(request, 'maps/certificate.html', context)
+
     
     # If not POST, redirect to form
     return redirect('map_view')

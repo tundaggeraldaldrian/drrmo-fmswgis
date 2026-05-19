@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +42,8 @@
             overflow: hidden;
             display: flex;
             flex-direction: row;
-            position: relative; /* ensure pseudo element anchors correctly */
+            position: relative;
+            /* ensure pseudo element anchors correctly */
         }
 
         .container::before {
@@ -105,7 +107,8 @@
             flex-direction: column;
             gap: 12px;
             max-width: 400px;
-            pointer-events: auto; /* allow manual close */
+            pointer-events: auto;
+            /* allow manual close */
         }
 
         .toast-notification {
@@ -227,6 +230,7 @@
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -244,6 +248,7 @@
             from {
                 width: 100%;
             }
+
             to {
                 width: 0;
             }
@@ -304,8 +309,10 @@
             left: 6px;
             color: var(--text-muted);
             font-size: 14px;
-                z-index: 10; /* keep icon above input when focused */
-                pointer-events: none; /* let input receive clicks */
+            z-index: 10;
+            /* keep icon above input when focused */
+            pointer-events: none;
+            /* let input receive clicks */
         }
 
         /* Global form-control style used by Django widgets */
@@ -319,7 +326,8 @@
             /* further reduce left padding so placeholder is closer to left edge */
             /* make placeholders even closer to the left edge */
             /* placeholder moved further to the left for registers */
-            padding: 12px 16px 12px 10px; /* moved further left - 10px from left edge */
+            padding: 12px 16px 12px 10px;
+            /* moved further left - 10px from left edge */
             border: 2px solid var(--border-gray);
             border-radius: 10px;
             font-size: 15px;
@@ -470,54 +478,59 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="container">
         <!-- Left Side (Logo & Welcome) -->
-            <div class="logo-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 420px; padding-top: 64px;">
+        <div class="logo-section"
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 420px; padding-top: 64px;">
             {% load static %}
             <img src="{% static 'images/drrmo_logo.png' %}" alt="SCDRRMO Logo">
             <div class="welcome-text" style="margin-top: 24px;">Create Your Account</div>
             <h2 style="margin-bottom: 8px;">DRRMO Silay City</h2>
-            <p style="color: var(--text-muted); font-size: 15px; text-align: center;">Disaster Risk Reduction and Management Office<br>Flood Monitoring & Early Warning System</p>
-            
+            <p style="color: var(--text-muted); font-size: 15px; text-align: center;">Disaster Risk Reduction and
+                Management Office<br>Flood Monitoring & Early Warning System</p>
+
             <!-- Auto-generated Staff ID Notice -->
-            <div style="margin-top: 32px; padding: 16px; background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 1px solid #3b82f6; border-radius: 12px; max-width: 280px; text-align: center;">
+            <div
+                style="margin-top: 32px; padding: 16px; background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 1px solid #3b82f6; border-radius: 12px; max-width: 280px; text-align: center;">
                 <i class="fas fa-info-circle" style="color: #1e40af; font-size: 24px; margin-bottom: 8px;"></i>
                 <p style="color: #1e40af; font-size: 13px; margin: 0; font-weight: 500; line-height: 1.5;">
                     <strong>Staff ID</strong> will be automatically assigned upon registration approval
                 </p>
             </div>
-        </div>        <!-- Right Side (Form) -->
+        </div> <!-- Right Side (Form) -->
         <div class="form-container">
             <form method="post">
                 {% csrf_token %}
-                
+
                 <!-- Display form errors if any -->
                 {% if form.errors %}
-                <div style="background-color: #fee2e2; border-left: 4px solid #dc2626; color: #991b1b; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; font-size: 14px;">
+                <div
+                    style="background-color: #fee2e2; border-left: 4px solid #dc2626; color: #991b1b; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; font-size: 14px;">
                     <strong>Please correct the following errors:</strong>
                     <ul style="margin: 8px 0 0 20px; padding: 0;">
                         {% if form.non_field_errors %}
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
                         {% endif %}
                         {% for bf in form.visible_fields %}
-                            {% if bf.errors %}
-                                {% for error in bf.errors %}
-                                    <li>{{ bf.label }}: {{ error }}</li>
-                                {% endfor %}
-                            {% endif %}
+                        {% if bf.errors %}
+                        {% for error in bf.errors %}
+                        <li>{{ bf.label }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endif %}
                         {% endfor %}
                     </ul>
                 </div>
                 {% endif %}
-                
+
                 <!-- Messages will be displayed as toasts -->
-                
+
                 <!-- Personal Information -->
                 <div class="form-row">
                     <div class="form-group {% if form.first_name.errors %}error{% endif %}">
@@ -526,11 +539,11 @@
                             {{ form.first_name }}
                         </div>
                         {% if form.first_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.first_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.first_name.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                     <div class="form-group {% if form.last_name.errors %}error{% endif %}">
@@ -539,11 +552,11 @@
                             {{ form.last_name }}
                         </div>
                         {% if form.last_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.last_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.last_name.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                 </div>
@@ -557,11 +570,11 @@
                         </div>
                         <span class="form-help">Choose a unique username for your account</span>
                         {% if form.username.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.username.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                     <div class="form-group {% if form.email.errors %}error{% endif %}">
@@ -571,11 +584,11 @@
                         </div>
                         <span class="form-help">Your email will be used for account verification</span>
                         {% if form.email.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.email.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                 </div>
@@ -589,11 +602,11 @@
                         </div>
                         <span class="form-help">Must be 18-80 years old</span>
                         {% if form.date_of_birth.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.date_of_birth.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.date_of_birth.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                     <div class="form-group {% if form.contact_number.errors %}error{% endif %}">
@@ -603,11 +616,11 @@
                         </div>
                         <span class="form-help">11-digit mobile number</span>
                         {% if form.contact_number.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.contact_number.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.contact_number.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                 </div>
@@ -620,24 +633,25 @@
                             {{ form.position }}
                         </div>
                         {% if form.position.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.position.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.position.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
-                    <div class="form-group {% if form.custom_position.errors %}error{% endif %}" id="customPositionGroup" style="display: none;">
+                    <div class="form-group {% if form.custom_position.errors %}error{% endif %}"
+                        id="customPositionGroup" style="display: none;">
                         <label><i class="fas fa-edit"></i> Specify Position</label>
                         <div class="input-wrapper">
                             {{ form.custom_position }}
                         </div>
                         {% if form.custom_position.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.custom_position.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.custom_position.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                 </div>
@@ -651,11 +665,11 @@
                         </div>
                         <span class="form-help">At least 8 characters with letters, numbers, and symbols</span>
                         {% if form.password1.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.password1.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.password1.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                     <div class="form-group {% if form.password2.errors %}error{% endif %}">
@@ -665,11 +679,11 @@
                         </div>
                         <span class="form-help">Re-enter your password to confirm</span>
                         {% if form.password2.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.password2.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="errorlist">
+                            {% for error in form.password2.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
                 </div>
@@ -686,11 +700,11 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const positionField = document.querySelector('select[name="position"]');
             const customPositionGroup = document.getElementById('customPositionGroup');
             const customPositionField = document.querySelector('input[name="custom_position"]');
-            
+
             // Function to toggle custom position field visibility
             function toggleCustomPositionField() {
                 if (positionField.value === 'others') {
@@ -702,19 +716,19 @@
                     customPositionField.value = '';
                 }
             }
-            
+
             // Show/hide on page load (in case form is being re-rendered with errors)
             toggleCustomPositionField();
-            
+
             // Show/hide on change
             if (positionField) {
                 positionField.addEventListener('change', toggleCustomPositionField);
             }
 
             const contactField = document.querySelector('input[name="contact_number"]');
-            
+
             if (contactField) {
-                contactField.addEventListener('input', function() {
+                contactField.addEventListener('input', function () {
                     validateContactNumber(this);
                 });
             }
@@ -722,7 +736,7 @@
             function validateContactNumber(field) {
                 const parent = field.closest('.form-group');
                 parent.classList.remove('error');
-                
+
                 const existingError = parent.querySelector('.errorlist');
                 if (existingError) existingError.remove();
 
@@ -748,7 +762,7 @@
         // ============================================
         function showToast(message, type = 'info', duration = 5000) {
             const container = document.getElementById('toastContainer');
-            
+
             // Icon mapping
             const icons = {
                 success: 'fa-check-circle',
@@ -757,7 +771,7 @@
                 warning: 'fa-exclamation-triangle',
                 info: 'fa-info-circle'
             };
-            
+
             // Create toast element
             const toast = document.createElement('div');
             toast.className = `toast-notification toast-${type}`;
@@ -773,47 +787,47 @@
                 </button>
                 <div class="toast-progress"></div>
             `;
-            
+
             container.appendChild(toast);
-            
+
             // Auto-dismiss after duration
             const timer = setTimeout(() => {
                 dismissToast(toast.querySelector('.toast-close'));
             }, duration);
-            
+
             // Store timer for manual dismissal
             toast.dataset.timer = timer;
-            
+
             return toast;
         }
-        
+
         function dismissToast(button) {
             const toast = button.closest('.toast-notification');
             if (!toast) return;
-            
+
             // Clear auto-dismiss timer
             if (toast.dataset.timer) {
                 clearTimeout(parseInt(toast.dataset.timer));
             }
-            
+
             // Add hiding animation
             toast.classList.add('hiding');
-            
+
             // Remove from DOM after animation
             setTimeout(() => {
                 toast.remove();
             }, 400);
         }
-        
+
         // Display Django messages as toasts on page load
         {% if messages %}
-            {% for message in messages %}
-                showToast(
-                    "{{ message|escapejs }}", 
-                    "{{ message.tags|default:'info' }}",
-                    5000
-                );
-            {% endfor %}
+        {% for message in messages %}
+        showToast(
+            "{{ message|escapejs }}",
+            "{{ message.tags|default:'info' }}",
+            5000
+        );
+        {% endfor %}
         {% endif %}
 
         // Set date constraints for date of birth field (18-80 years old, no future dates)
@@ -822,10 +836,11 @@
             const today = new Date();
             const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             const minDate = new Date(today.getFullYear() - 80, today.getMonth(), today.getDate());
-            
+
             dobField.max = maxDate.toISOString().split('T')[0];
             dobField.min = minDate.toISOString().split('T')[0];
         }
     </script>
 </body>
+
 </html>

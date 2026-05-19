@@ -590,89 +590,12 @@ def monitoring_view(request):
         timestamp__gte=time_filter
     ).order_by('timestamp').values('timestamp', 'height_m'))
     
-    # Pagination for flood records
-    page_number = request.GET.get('page', 1)
-    records_per_page = int(request.GET.get('per_page', 20))  # Default 20, allow customization
+    # Simplified flood record summary for dashboard link
+    total_flood_records_count = FloodRecord.objects.count()
     
-    # Limit records per page to prevent abuse
-    records_per_page = min(records_per_page, 100)
-    
-    # Get all flood records ordered by date
-    flood_records_queryset = FloodRecord.objects.all().order_by('-date')
-    
-    # Apply pagination
-    paginator = Paginator(flood_records_queryset, records_per_page)
-    
-    try:
-        flood_records_page = paginator.page(page_number)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page
-        flood_records_page = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range, deliver last page
-        flood_records_page = paginator.page(paginator.num_pages)
-    
-    # Convert to list of dictionaries for template rendering
-    flood_records = list(flood_records_page.object_list.values(
-        'id', 'event', 'date', 'affected_barangays', 'casualties_dead', 'casualties_injured', 'casualties_missing',
-        'affected_persons', 'affected_families', 'houses_damaged_partially', 'houses_damaged_totally',
-        'damage_infrastructure_php', 'damage_agriculture_php', 'damage_institutions_php',
-        'damage_private_commercial_php', 'damage_total_php', 'barangay_data'
-    ))
-    
-    # Format numbers with thousands separator for display (only if records exist)
-    for record in flood_records:
-        record['casualties_dead_fmt'] = "{:,.0f}".format(record['casualties_dead'])
-        record['casualties_injured_fmt'] = "{:,.0f}".format(record['casualties_injured'])
-        record['casualties_missing_fmt'] = "{:,.0f}".format(record['casualties_missing'])
-        record['affected_persons_fmt'] = "{:,.0f}".format(record['affected_persons'])
-        record['affected_families_fmt'] = "{:,.0f}".format(record['affected_families'])
-        record['houses_damaged_partially_fmt'] = "{:,.0f}".format(record['houses_damaged_partially'])
-        record['houses_damaged_totally_fmt'] = "{:,.0f}".format(record['houses_damaged_totally'])
-        record['damage_infrastructure_php_fmt'] = "{:,.2f}".format(record['damage_infrastructure_php'])
-        record['damage_agriculture_php_fmt'] = "{:,.2f}".format(record['damage_agriculture_php'])
-        record['damage_institutions_php_fmt'] = "{:,.2f}".format(record['damage_institutions_php'])
-        record['damage_private_commercial_php_fmt'] = "{:,.2f}".format(record['damage_private_commercial_php'])
-        record['damage_total_php_fmt'] = "{:,.2f}".format(record['damage_total_php'])
-        # Serialize barangay_data as JSON string for template
-        record['barangay_data_json'] = json.dumps(record.get('barangay_data') or {})
-
-    # Aggregate data for graphs (provide empty arrays if no flood records)
-    if flood_records:
-        dates = [record['date'].strftime('%Y-%m-%d') for record in flood_records]
-        casualties_data = {
-            'dead': [record['casualties_dead'] for record in flood_records],
-            'injured': [record['casualties_injured'] for record in flood_records],
-            'missing': [record['casualties_missing'] for record in flood_records],
-        }
-        affected_data = {
-            'persons': [record['affected_persons'] for record in flood_records],
-            'families': [record['affected_families'] for record in flood_records],
-        }
-        houses_data = {
-            'partially': [record['houses_damaged_partially'] for record in flood_records],
-            'totally': [record['houses_damaged_totally'] for record in flood_records],
-        }
-        damage_data = {
-            'infrastructure': [float(record['damage_infrastructure_php']) for record in flood_records],
-            'agriculture': [float(record['damage_agriculture_php']) for record in flood_records],
-            'institutions': [float(record['damage_institutions_php']) for record in flood_records],
-            'private_commercial': [float(record['damage_private_commercial_php']) for record in flood_records],
-            'total': [float(record['damage_total_php']) for record in flood_records],
-        }
-    else:
-        # Empty arrays as fallback when no flood records exist
-        dates = []
-        casualties_data = {'dead': [], 'injured': [], 'missing': []}
-        affected_data = {'persons': [], 'families': []}
-        houses_data = {'partially': [], 'totally': []}
-        damage_data = {'infrastructure': [], 'agriculture': [], 'institutions': [], 'private_commercial': [], 'total': []}
-    
-    # Create barangay data map for chart tooltips (indexed by date)
-    barangay_data_by_date = {}
-    for record in flood_records:
-        date_str = record['date'].strftime('%Y-%m-%d')
-        barangay_data_by_date[date_str] = record.get('barangay_data', {}) or {}
+    # We only need a small summary for any quick stats if needed, 
+    # but the detailed aggregation is moved to the dedicated page.
+    flood_records_summary = FloodRecord.objects.all().order_by('-date')[:5]
 
     # Prepare rainfall and tide trend data (convert UTC to Manila timezone)
     from django.utils.timezone import localtime
@@ -698,8 +621,8 @@ def monitoring_view(request):
         forecast_humidity = []
         forecast_wind_speed = []
 
-    # Generate flood prediction insights
-    insights = generate_flood_insights(weather_forecast, rainfall_data, tide_data, flood_records)
+    # Generate flood prediction insights (using current data and forecast)
+    insights = generate_flood_insights(weather_forecast, rainfall_data, tide_data, None)
 
     # Determine flood risk levels
     rain_risk_level, rain_risk_color = get_flood_risk_level(rainfall_data.value_mm if rainfall_data else 0)
@@ -757,14 +680,7 @@ def monitoring_view(request):
         'tide_risk_color': tide_risk_color,
         'combined_risk_level': combined_risk_level,
         'combined_risk_color': combined_risk_color,
-        'flood_records': flood_records,
-        'flood_records_page': flood_records_page,  # Pagination object
-        'paginator': paginator,  # For page info
-        'graph_dates': dates,
-        'casualties_data': casualties_data,
-        'affected_data': affected_data,
-        'houses_data': houses_data,
-        'damage_data': damage_data,
+        'total_flood_records_count': total_flood_records_count,
         'rainfall_timestamps': rainfall_timestamps,
         'rainfall_values': rainfall_values,
         'tide_timestamps': tide_timestamps,
@@ -773,9 +689,8 @@ def monitoring_view(request):
         'range_label': range_label,
         'min_date': min_date,
         'max_date': max_date,
-        'available_years': years_list,
-        'barangay_data_by_date': json.dumps(barangay_data_by_date),  # For chart tooltips
     }
+
     return render(request, 'monitoring/monitoring.html', context)
 
 @login_required
@@ -1432,9 +1347,15 @@ def export_trends(request):
         single_year_str = request.GET.get('year', '')
         compare_years_str = request.GET.get('compare_years', '')
         
-        # Get chart images from POST data
+        # Get chart images from POST data with size protection
         rainfall_chart_b64 = request.POST.get('rainfall_chart', '')
         tide_chart_b64 = request.POST.get('tide_chart', '')
+        
+        # SECURITY: Limit base64 payload size to prevent memory-based DoS
+        max_size = getattr(settings, 'MAX_CHART_BASE64_SIZE', 2 * 1024 * 1024)
+        if len(rainfall_chart_b64) > max_size or len(tide_chart_b64) > max_size:
+            messages.error(request, "Chart data too large. Please try a smaller date range.")
+            return redirect('monitoring')
     else:
         export_type = request.GET.get('type', 'csv')
         time_range = request.GET.get('time_range', '')
@@ -1634,11 +1555,13 @@ def export_trends(request):
         return response
     
     elif export_type == 'pdf':
-        from reportlab.lib.utils import ImageReader
-        from reportlab.platypus import Image as RLImage
+        from reportlab.platypus import Image as RLImage, PageBreak
         from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
         import os
+        import io
         
+        # Use BytesIO buffer for PDF generation to satisfy type checkers
+        buffer = io.BytesIO()
         response = HttpResponse(content_type='application/pdf')
         filename = f'rainfall_tide_trends_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -1674,15 +1597,15 @@ def export_trends(request):
             # Page number
             canvas.setFont('Helvetica', 7)
             canvas.setFillColor(colors.HexColor('#6b7280'))
-            page_text = f"Page {doc.page}"
+            page_text = f"Page {canvas.getPageNumber()}"
             canvas.drawRightString(page_width - 0.5*inch, 0.28*inch, page_text)
             
             canvas.restoreState()
         
         # Use PORTRAIT orientation
-        doc = SimpleDocTemplate(response, pagesize=letter, 
-                                rightMargin=0.5*inch, leftMargin=0.5*inch,
-                                topMargin=1*inch, bottomMargin=0.7*inch)
+        doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                                bottomMargin=0.5*inch, topMargin=0.5*inch,
+                                rightMargin=0.5*inch, leftMargin=0.5*inch)
         elements = []
         styles = getSampleStyleSheet()
         
@@ -1736,7 +1659,7 @@ def export_trends(request):
         # Add charts to PDF - use captured images from frontend if available
         if rainfall_chart_b64 and tide_chart_b64:
             try:
-                from reportlab.platypus import Image as RLImage, PageBreak
+                # RLImage and PageBreak are already imported in outer scope
                 
                 # Decode base64 images (remove data:image/png;base64, prefix if present)
                 rainfall_image_data = rainfall_chart_b64.split(',')[1] if ',' in rainfall_chart_b64 else rainfall_chart_b64
@@ -2034,6 +1957,10 @@ def export_trends(request):
         elements.append(table)
         doc.build(elements, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
         
+        # Write buffer content to response
+        response.write(buffer.getvalue())
+        buffer.close()
+        
         return response
 
 
@@ -2049,6 +1976,7 @@ def export_flood_records(request):
     from reportlab.lib import colors
     from reportlab.lib.units import inch
     from reportlab.lib.enums import TA_LEFT
+    import io
     
     export_type = request.GET.get('type', 'csv')
     start_year = request.GET.get('start_year')
@@ -2111,13 +2039,14 @@ def export_flood_records(request):
         return response
     
     elif export_type == 'pdf':
-        from reportlab.lib.utils import ImageReader
         from reportlab.platypus import Image as RLImage
         from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
         import os
         
+        # Use BytesIO buffer for PDF generation
+        buffer = io.BytesIO()
         response = HttpResponse(content_type='application/pdf')
         filename = f'flood_records_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -2153,15 +2082,15 @@ def export_flood_records(request):
             # Page number
             canvas.setFont('Helvetica', 7)
             canvas.setFillColor(colors.HexColor('#6b7280'))
-            page_text = f"Page {doc.page}"
+            page_text = f"Page {canvas.getPageNumber()}"
             canvas.drawRightString(page_width - 0.4*inch, 0.28*inch, page_text)
             
             canvas.restoreState()
         
         # Use LANDSCAPE orientation
-        doc = SimpleDocTemplate(response, pagesize=landscape(letter), 
-                                rightMargin=0.4*inch, leftMargin=0.4*inch,
-                                topMargin=1*inch, bottomMargin=0.7*inch)
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), 
+                               topMargin=1.3*inch, bottomMargin=1*inch,
+                               leftMargin=0.5*inch, rightMargin=0.5*inch)
         elements = []
         styles = getSampleStyleSheet()
         
@@ -2346,4 +2275,115 @@ def export_flood_records(request):
         elements.append(table)
         doc.build(elements, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
         
+        # Write buffer content to response
+        response.write(buffer.getvalue())
+        buffer.close()
+        
         return response
+
+@login_required
+def flood_records_list(request):
+    """View to display historical flood records in a dedicated list page."""
+    # Get filters
+    start_year = request.GET.get('start_year')
+    end_year = request.GET.get('end_year')
+    search_query = request.GET.get('search', '')
+    
+    # Get all flood records ordered by date
+    flood_records_queryset = FloodRecord.objects.all().order_by('-date')
+    
+    # Apply filters
+    if start_year:
+        flood_records_queryset = flood_records_queryset.filter(date__year__gte=start_year)
+    if end_year:
+        flood_records_queryset = flood_records_queryset.filter(date__year__lte=end_year)
+    if search_query:
+        flood_records_queryset = flood_records_queryset.filter(event__icontains=search_query) | \
+                                 flood_records_queryset.filter(affected_barangays__icontains=search_query)
+
+    # Pagination
+    page_number = request.GET.get('page', 1)
+    records_per_page = 20
+    paginator = Paginator(flood_records_queryset, records_per_page)
+    
+    try:
+        flood_records_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        flood_records_page = paginator.page(1)
+    except EmptyPage:
+        flood_records_page = paginator.page(paginator.num_pages)
+    
+    # Format numbers for display
+    flood_records = []
+    for record in flood_records_page:
+        record_dict = {
+            'id': record.id,
+            'event': record.event,
+            'date': record.date,
+            'affected_barangays': record.affected_barangays,
+            'casualties_dead_fmt': "{:,.0f}".format(record.casualties_dead),
+            'casualties_injured_fmt': "{:,.0f}".format(record.casualties_injured),
+            'casualties_missing_fmt': "{:,.0f}".format(record.casualties_missing),
+            'affected_persons_fmt': "{:,.0f}".format(record.affected_persons),
+            'affected_families_fmt': "{:,.0f}".format(record.affected_families),
+            'houses_damaged_partially_fmt': "{:,.0f}".format(record.houses_damaged_partially),
+            'houses_damaged_totally_fmt': "{:,.0f}".format(record.houses_damaged_totally),
+            'damage_infrastructure_php_fmt': "{:,.2f}".format(record.damage_infrastructure_php),
+            'damage_agriculture_php_fmt': "{:,.2f}".format(record.damage_agriculture_php),
+        'damage_total_php_fmt': "{:,.2f}".format(record.damage_total_php),
+            'barangay_data_json': json.dumps(record.barangay_data or {})
+        }
+        flood_records.append(record_dict)
+
+    # Aggregate data for graphs (based on the filtered queryset)
+    graph_queryset = flood_records_queryset.order_by('date').values(
+        'date', 'casualties_dead', 'casualties_injured', 'casualties_missing',
+        'affected_persons', 'affected_families', 'houses_damaged_partially', 'houses_damaged_totally',
+        'damage_infrastructure_php', 'damage_agriculture_php', 'damage_institutions_php',
+        'damage_private_commercial_php', 'damage_total_php', 'barangay_data'
+    )
+
+    graph_dates = []
+    casualties_data = {'dead': [], 'injured': [], 'missing': []}
+    affected_data = {'persons': [], 'families': []}
+    houses_data = {'partially': [], 'totally': []}
+    damage_data = {'infrastructure': [], 'agriculture': [], 'institutions': [], 'private_commercial': [], 'total': []}
+    barangay_data_by_date = {}
+
+    for record in graph_queryset:
+        date_str = record['date'].strftime('%Y-%m-%d')
+        graph_dates.append(date_str)
+        casualties_data['dead'].append(record['casualties_dead'])
+        casualties_data['injured'].append(record['casualties_injured'])
+        casualties_data['missing'].append(record['casualties_missing'])
+        affected_data['persons'].append(record['affected_persons'])
+        affected_data['families'].append(record['affected_families'])
+        houses_data['partially'].append(record['houses_damaged_partially'])
+        houses_data['totally'].append(record['houses_damaged_totally'])
+        damage_data['infrastructure'].append(float(record['damage_infrastructure_php']))
+        damage_data['agriculture'].append(float(record['damage_agriculture_php']))
+        damage_data['institutions'].append(float(record['damage_institutions_php']))
+        damage_data['private_commercial'].append(float(record['damage_private_commercial_php']))
+        damage_data['total'].append(float(record['damage_total_php']))
+        barangay_data_by_date[date_str] = record.get('barangay_data', {}) or {}
+
+    # Get available years for filter
+    available_years = FloodRecord.objects.dates('date', 'year', order='DESC')
+    years_list = [date.year for date in available_years]
+
+    context = {
+        'flood_records': flood_records,
+        'flood_records_page': flood_records_page,
+        'available_years': years_list,
+        'start_year': start_year,
+        'end_year': end_year,
+        'search_query': search_query,
+        'total_count': flood_records_queryset.count(),
+        'graph_dates': graph_dates,
+        'casualties_data': casualties_data,
+        'affected_data': affected_data,
+        'houses_data': houses_data,
+        'damage_data': damage_data,
+        'barangay_data_by_date': json.dumps(barangay_data_by_date),
+    }
+    return render(request, 'monitoring/flood_records_list.html', context)

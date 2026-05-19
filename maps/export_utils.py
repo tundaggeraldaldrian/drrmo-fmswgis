@@ -12,7 +12,6 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.lib.utils import ImageReader
 import os
 
 # Maximum records per export to prevent memory/timeout issues
@@ -367,6 +366,9 @@ def export_to_pdf(title, headers, data, filename_prefix, filter_info=None, summa
                 'error': 'No records found to export. Please adjust your filters.'
             }, status=400)
     
+        # Create a buffer for the PDF
+        buffer = io.BytesIO()
+        
         response = HttpResponse(content_type='application/pdf')
         filename = f'{filename_prefix}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -404,7 +406,7 @@ def export_to_pdf(title, headers, data, filename_prefix, filter_info=None, summa
         
         # Create PDF with portrait orientation
         doc = SimpleDocTemplate(
-            response,
+            buffer,
             pagesize=letter,
             topMargin=1.3*inch,
             bottomMargin=1*inch,
@@ -558,6 +560,12 @@ def export_to_pdf(title, headers, data, filename_prefix, filter_info=None, summa
         
         # Build PDF with header and footer
         doc.build(elements, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
+        
+        # Get the value of the BytesIO buffer and write it to the response
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        
         return response
     except Exception as e:
         return JsonResponse({

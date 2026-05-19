@@ -49,9 +49,9 @@
         color: var(--text-dark);
         padding: 0;
         overflow-y: auto;
-        box-shadow: 
-            2px 0 24px rgba(0,0,0,0.1),
-            inset -1px 0 0 rgba(0,0,0,0.05);
+        box-shadow:
+            2px 0 24px rgba(0, 0, 0, 0.1),
+            inset -1px 0 0 rgba(0, 0, 0, 0.05);
         border-right: 2px solid rgba(224, 231, 255, 0.8);
         display: flex;
         flex-direction: column;
@@ -212,7 +212,7 @@
         border-radius: 16px;
         border: 2px solid #e0e7ff;
         margin-top: 8px;
-        box-shadow: 
+        box-shadow:
             0 4px 12px rgba(0, 0, 0, 0.06),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
@@ -270,7 +270,7 @@
         width: 40px;
         height: 22px;
         margin-right: 14px;
-        border: 2px solid rgba(0,0,0,0.15);
+        border: 2px solid rgba(0, 0, 0, 0.15);
         border-radius: 8px;
         flex-shrink: 0;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -293,7 +293,7 @@
         padding: 4px;
         gap: 4px;
         border: 2px solid #e0e7ff;
-        box-shadow: 
+        box-shadow:
             0 2px 6px rgba(0, 0, 0, 0.06),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
@@ -341,7 +341,7 @@
     .switch-btn.active {
         background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
         color: white;
-        box-shadow: 
+        box-shadow:
             0 4px 12px rgba(37, 99, 235, 0.35),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         transform: scale(1.05);
@@ -362,7 +362,7 @@
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         margin-bottom: 10px;
         border: 2px solid #e0e7ff;
-        box-shadow: 
+        box-shadow:
             0 2px 6px rgba(0, 0, 0, 0.04),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
@@ -431,14 +431,14 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    input:checked + .slider {
+    input:checked+.slider {
         background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
-        box-shadow: 
+        box-shadow:
             inset 0 2px 4px rgba(0, 0, 0, 0.1),
             0 0 12px rgba(37, 99, 235, 0.3);
     }
 
-    input:checked + .slider:before {
+    input:checked+.slider:before {
         transform: translateX(22px);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
@@ -461,9 +461,9 @@
         pointer-events: none;
         font-size: 14px;
         z-index: 1000;
-        box-shadow: 
-            0 12px 32px rgba(0,0,0,0.18),
-            0 4px 12px rgba(0,0,0,0.08);
+        box-shadow:
+            0 12px 32px rgba(0, 0, 0, 0.18),
+            0 4px 12px rgba(0, 0, 0, 0.08);
         color: var(--text-dark);
         line-height: 1.6;
         border: 2px solid #e0e7ff;
@@ -483,16 +483,19 @@
             opacity: 0;
             transform: scale(0.8) translateY(10px);
         }
+
         50% {
             transform: scale(1.05) translateY(-2px);
         }
+
         100% {
             opacity: 1;
             transform: scale(1) translateY(0);
         }
     }
 
-    #risk-graph, #risk-table {
+    #risk-graph,
+    #risk-table {
         margin-top: 0;
         width: 100%;
         display: block;
@@ -511,7 +514,8 @@
         border: 1px solid var(--border-gray);
     }
 
-    th, td {
+    th,
+    td {
         border: 1px solid var(--border-gray);
         padding: 12px 14px;
         text-align: left;
@@ -532,7 +536,8 @@
     #loading-screen {
         display: none;
         position: fixed;
-        top: 60px; /* Account for header */
+        top: 60px;
+        /* Account for header */
         left: 0;
         width: 100%;
         height: calc(100vh - 60px);
@@ -549,8 +554,13 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
     #loading-content {
@@ -559,8 +569,8 @@
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         padding: 40px 44px;
         border-radius: 24px;
-        box-shadow: 
-            0 24px 72px rgba(0,0,0,0.35),
+        box-shadow:
+            0 24px 72px rgba(0, 0, 0, 0.35),
             inset 0 1px 0 rgba(255, 255, 255, 0.95);
         border: 2px solid #e0e7ff;
         max-width: 360px;
@@ -569,13 +579,14 @@
     }
 
     @keyframes slideUp {
-        from { 
-            transform: translateY(30px) scale(0.9); 
-            opacity: 0; 
+        from {
+            transform: translateY(30px) scale(0.9);
+            opacity: 0;
         }
-        to { 
-            transform: translateY(0) scale(1); 
-            opacity: 1; 
+
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
     }
 
@@ -596,13 +607,23 @@
     }
 
     @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     @keyframes scaleIn {
-        from { transform: scale(0); }
-        to { transform: scale(1); }
+        from {
+            transform: scale(0);
+        }
+
+        to {
+            transform: scale(1);
+        }
     }
 
     #loading-content h3 {
@@ -619,8 +640,15 @@
     }
 
     @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.2); }
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
     }
 
     #loading-content::after {
@@ -632,7 +660,8 @@
         font-weight: 500;
     }
 
-    #cancel-btn, #see-result-btn {
+    #cancel-btn,
+    #see-result-btn {
         margin-top: 12px;
         padding: 14px 28px;
         border: none;
@@ -650,7 +679,8 @@
         overflow: hidden;
     }
 
-    #cancel-btn::before, #see-result-btn::before {
+    #cancel-btn::before,
+    #see-result-btn::before {
         content: '';
         position: absolute;
         top: 50%;
@@ -663,12 +693,14 @@
         transition: width 0.6s, height 0.6s;
     }
 
-    #cancel-btn:hover::before, #see-result-btn:hover::before {
+    #cancel-btn:hover::before,
+    #see-result-btn:hover::before {
         width: 300px;
         height: 300px;
     }
 
-    #cancel-btn:hover, #see-result-btn:hover {
+    #cancel-btn:hover,
+    #see-result-btn:hover {
         background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
         transform: translateY(-2px);
         box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
@@ -687,13 +719,14 @@
     #assessment-panel {
         position: fixed;
         right: -420px;
-        top: 60px; /* Account for header */
+        top: 60px;
+        /* Account for header */
         width: 420px;
         height: calc(100vh - 60px);
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        box-shadow: 
-            -4px 0 24px rgba(0,0,0,0.15),
-            inset 1px 0 0 rgba(0,0,0,0.05);
+        box-shadow:
+            -4px 0 24px rgba(0, 0, 0, 0.15),
+            inset 1px 0 0 rgba(0, 0, 0, 0.05);
         padding: 0;
         transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 2001;
@@ -773,7 +806,7 @@
         border-radius: 12px;
         border: 2px solid #e0e7ff;
         margin-bottom: 16px;
-        box-shadow: 
+        box-shadow:
             0 2px 6px rgba(0, 0, 0, 0.04),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
@@ -782,6 +815,7 @@
         .sidebar {
             width: 300px;
         }
+
         .stat-card {
             padding: 20px;
         }
@@ -793,6 +827,7 @@
             height: calc(100vh - 60px);
             top: 60px;
         }
+
         .sidebar {
             width: 100%;
             height: 320px;
@@ -800,21 +835,26 @@
             border-bottom: 2px solid #e0e7ff;
             max-height: 40vh;
         }
+
         .sidebar-header h2 {
             font-size: 20px;
         }
+
         .back-to-dashboard {
             font-size: 13px;
             padding: 10px 16px;
         }
+
         .legend-item {
             font-size: 13px;
             padding: 8px 10px;
         }
+
         .switch-btn {
             font-size: 13px;
             padding: 10px 14px;
         }
+
         #assessment-panel {
             width: 100%;
             height: calc(100vh - 320px);
@@ -824,10 +864,12 @@
             border-left: none;
             border-top: 2px solid #e0e7ff;
         }
+
         #loading-screen {
             height: calc(100vh - 60px);
             top: 60px;
         }
+
         #loading-content {
             max-width: calc(100vw - 32px);
             padding: 32px 24px;
@@ -838,12 +880,15 @@
         .sidebar-header h2 {
             font-size: 18px;
         }
+
         .section-title {
             font-size: 12px;
         }
+
         .legend-item {
             font-size: 12px;
         }
+
         #barangay-select {
             font-size: 13px;
             padding: 12px 16px;
@@ -852,6 +897,7 @@
 
     /* Improve touch targets for mobile */
     @media (max-width: 768px) {
+
         .switch-btn,
         .toggle-switch,
         .back-to-dashboard,
@@ -863,6 +909,7 @@
 
     /* Reduce motion for accessibility */
     @media (prefers-reduced-motion: reduce) {
+
         *,
         *::before,
         *::after {
@@ -891,7 +938,7 @@
                 <select id="barangay-select">
                     <option value="">View All Barangays</option>
                     {% for name in barangay_names %}
-                        <option value="{{ name }}">{{ name }}</option>
+                    <option value="{{ name }}">{{ name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -974,7 +1021,7 @@
     <!-- Map Container -->
     <div id="map" data-barangays='{{ barangays_json|safe }}' data-floods='{{ flood_areas_json|safe }}'>
         <div id="popup"></div>
-        
+
         <!-- Real-time Flood Risk Alert Banner -->
         <div id="risk-alert-banner" style="display: none;">
             <div class="risk-banner-content">
@@ -1024,7 +1071,8 @@
     }
 
     /* Prevent horizontal scrolling */
-    html, body {
+    html,
+    body {
         overflow-x: hidden !important;
         width: 100% !important;
     }
@@ -1046,6 +1094,7 @@
             opacity: 0;
             transform: translateX(-50%) translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
@@ -1083,9 +1132,12 @@
     }
 
     @keyframes pulse {
-        0%, 100% {
+
+        0%,
+        100% {
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
+
         50% {
             box-shadow: 0 8px 32px rgba(239, 68, 68, 0.7);
         }
@@ -1128,9 +1180,12 @@
 
     /* Highlighted zones pulsing animation */
     @keyframes highlightPulse {
-        0%, 100% {
+
+        0%,
+        100% {
             opacity: 0.7;
         }
+
         50% {
             opacity: 0.9;
         }
@@ -1175,7 +1230,7 @@
     });
 
     // Remove the default double-click zoom interaction
-    map.getInteractions().forEach(function(interaction) {
+    map.getInteractions().forEach(function (interaction) {
         if (interaction instanceof ol.interaction.DoubleClickZoom) {
             map.removeInteraction(interaction);
         }
@@ -1188,23 +1243,23 @@
 
     // Style for highlighted barangay
     var highlightStyle = new ol.style.Style({
-        stroke: new ol.style.Stroke({ 
-            color: '#fbbf24', 
-            width: 4 
+        stroke: new ol.style.Stroke({
+            color: '#fbbf24',
+            width: 4
         }),
-        fill: new ol.style.Fill({ 
-            color: 'rgba(251, 191, 36, 0.25)' 
+        fill: new ol.style.Fill({
+            color: 'rgba(251, 191, 36, 0.25)'
         })
     });
 
     // Default style for barangays
     var defaultBarangayStyle = new ol.style.Style({
-        stroke: new ol.style.Stroke({ 
-            color: '#6b7280', 
-            width: 2 
+        stroke: new ol.style.Stroke({
+            color: '#6b7280',
+            width: 2
         }),
-        fill: new ol.style.Fill({ 
-            color: 'rgba(0, 0, 0, 0)' 
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
         })
     });
 
@@ -1234,7 +1289,7 @@
     // Load barangay data
     var barangaysData = JSON.parse(document.getElementById('map').dataset.barangays || '[]');
     if (barangaysData.type === 'FeatureCollection' && barangaysData.features) {
-        barangaysData.features.forEach(function(feature) {
+        barangaysData.features.forEach(function (feature) {
             var barangayFeature = new ol.format.GeoJSON().readFeature(feature, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
@@ -1247,33 +1302,33 @@
     // Load flood susceptibility data
     var floodData = JSON.parse(document.getElementById('map').dataset.floods || '[]');
     if (floodData.type === 'FeatureCollection' && floodData.features) {
-        floodData.features.forEach(function(feature) {
+        floodData.features.forEach(function (feature) {
             var floodFeature = new ol.format.GeoJSON().readFeature(feature, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
             });
-            
+
             // Color mapping for flood risk levels
-            var colorMap = { 
+            var colorMap = {
                 'VHF': '#0a255b',
                 'HF': '#6124d8',
                 'MF': '#954fc9',
                 'LF': '#b9b2c8'
             };
-            
+
             var color = colorMap[feature.properties.haz_code] || '#ffffff';
             var rgb = hexToRgb(color);
-            
+
             floodFeature.setStyle(new ol.style.Style({
-                stroke: new ol.style.Stroke({ 
-                    color: '#000000', 
-                    width: 0.5 
+                stroke: new ol.style.Stroke({
+                    color: '#000000',
+                    width: 0.5
                 }),
-                fill: new ol.style.Fill({ 
-                    color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.6)' 
+                fill: new ol.style.Fill({
+                    color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.6)'
                 })
             }));
-            
+
             floodVectorSource.addFeature(floodFeature);
         });
     }
@@ -1304,7 +1359,7 @@
     var popup = document.getElementById('popup');
 
     // Map click handler
-    map.on('click', function(evt) {
+    map.on('click', function (evt) {
         var coordinate = evt.coordinate;
         var lonlat = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
         var viewResolution = map.getView().getResolution();
@@ -1312,13 +1367,13 @@
         // Hide existing popup
         popup.style.display = 'none';
 
-        var barangayFeature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+        var barangayFeature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
             return feature.get('name') ? feature : null;
         });
 
         var floodFeature = null;
         if (floodLayer.getVisible()) {
-            floodFeature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+            floodFeature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
                 return feature.get('haz_code') ? feature : null;
             });
         }
@@ -1345,10 +1400,10 @@
             popup.classList.add('show');
 
             // Auto-hide popup after 3 seconds with fade effect
-            setTimeout(function() {
+            setTimeout(function () {
                 popup.classList.remove('show');
                 // Hide completely after fade transition
-                setTimeout(function() {
+                setTimeout(function () {
                     popup.style.display = 'none';
                 }, 500);
             }, 3000);
@@ -1380,18 +1435,18 @@
             var area = data.areas[code] || 0;
             var percentage = totalArea > 0 ? (area / totalArea) * 100 : 0;
             var height = totalArea > 0 ? (area / totalArea) * maxHeight : 0;
-            
+
             var xPos = startX + (index * spacing);
-            
+
             // Draw bar
             ctx.fillStyle = colors[index];
             ctx.fillRect(xPos, canvas.height - height - 30, barWidth, height);
-            
+
             // Draw percentage above bar
             ctx.fillStyle = '#1a1a1a';
             ctx.font = 'bold 11px Inter, sans-serif';
             ctx.fillText(`${percentage.toFixed(1)}%`, xPos + barWidth / 2, canvas.height - height - 35);
-            
+
             // Draw label below bar
             ctx.fillStyle = '#6b7280';
             ctx.font = '10px Inter, sans-serif';
@@ -1493,7 +1548,7 @@
     drawBarGraph(calculateRiskPercentages(''));
 
     // Toggle between graph and table
-    document.getElementById('graph-btn').addEventListener('click', function() {
+    document.getElementById('graph-btn').addEventListener('click', function () {
         graphVisible = true;
         this.classList.add('active');
         document.getElementById('table-btn').classList.remove('active');
@@ -1502,7 +1557,7 @@
         drawBarGraph(calculateRiskPercentages(document.getElementById('barangay-select').value));
     });
 
-    document.getElementById('table-btn').addEventListener('click', function() {
+    document.getElementById('table-btn').addEventListener('click', function () {
         graphVisible = false;
         this.classList.add('active');
         document.getElementById('graph-btn').classList.remove('active');
@@ -1512,11 +1567,11 @@
     });
 
     // Initial graph and update on selection
-    document.getElementById('barangay-select').addEventListener('change', function() {
+    document.getElementById('barangay-select').addEventListener('change', function () {
         console.log('Selection changed to:', this.value);
         var selectedBarangay = this.value;
         barangayVectorSource.clear();
-        
+
         if (selectedBarangay) {
             var selectedFeature = barangaysData.features.find(f => f.properties.name === selectedBarangay);
             if (selectedFeature) {
@@ -1526,24 +1581,24 @@
                 });
                 feature.setStyle(highlightStyle);
                 barangayVectorSource.addFeature(feature);
-                
+
                 // Show the barangay layer when a barangay is selected
                 barangayLayer.setVisible(true);
-                
+
                 var extent = feature.getGeometry().getExtent();
-                map.getView().fit(extent, { 
-                    padding: [50, 50, 50, 50], 
-                    duration: 500 
+                map.getView().fit(extent, {
+                    padding: [50, 50, 50, 50],
+                    duration: 500
                 });
             }
         } else {
             map.getView().setCenter(ol.proj.fromLonLat([122.975, 10.787]));
             map.getView().setZoom(12);
-            
+
             // Hide the barangay layer when viewing all barangays
             barangayLayer.setVisible(false);
-            
-            barangaysData.features.forEach(function(feature) {
+
+            barangaysData.features.forEach(function (feature) {
                 var barangayFeature = new ol.format.GeoJSON().readFeature(feature, {
                     dataProjection: 'EPSG:4326',
                     featureProjection: 'EPSG:3857'
@@ -1563,14 +1618,14 @@
     var osmBtn = document.getElementById('osm-btn');
     var satelliteBtn = document.getElementById('satellite-btn');
 
-    osmBtn.addEventListener('click', function() {
+    osmBtn.addEventListener('click', function () {
         osmLayer.setVisible(true);
         satelliteLayer.setVisible(false);
         osmBtn.classList.add('active');
         satelliteBtn.classList.remove('active');
     });
 
-    satelliteBtn.addEventListener('click', function() {
+    satelliteBtn.addEventListener('click', function () {
         osmLayer.setVisible(false);
         satelliteLayer.setVisible(true);
         satelliteBtn.classList.add('active');
@@ -1578,7 +1633,7 @@
     });
 
     // Layer toggles
-    document.getElementById('flood-layer-toggle').addEventListener('change', function() {
+    document.getElementById('flood-layer-toggle').addEventListener('change', function () {
         floodLayer.setVisible(this.checked);
     });
 
@@ -1589,9 +1644,9 @@
     // Function to save assessment to database
     function saveAssessmentToDatabase(barangayName, lonlat, floodRisk) {
         // Get CSRF token
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                         document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
-        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+            document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+
         // Prepare form data
         const formData = new FormData();
         formData.append('barangay', barangayName || 'Unknown');
@@ -1599,7 +1654,7 @@
         formData.append('longitude', lonlat[0].toFixed(6));
         formData.append('flood_risk_code', floodRisk || 'Unknown');
         formData.append('csrfmiddlewaretoken', csrfToken);
-        
+
         // Send to server
         fetch('/maps/save-assessment/', {
             method: 'POST',
@@ -1608,20 +1663,20 @@
                 'X-CSRFToken': csrfToken
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Assessment saved successfully:', data);
-            } else {
-                console.error('Failed to save assessment:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving assessment:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Assessment saved successfully:', data);
+                } else {
+                    console.error('Failed to save assessment:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving assessment:', error);
+            });
     }
 
-    map.on('dblclick', function(evt) {
+    map.on('dblclick', function (evt) {
         var coordinate = evt.coordinate;
         var lonlat = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
 
@@ -1638,7 +1693,7 @@
         loadingScreen.classList.add('active');
         document.getElementById('cancel-btn').style.display = 'block';
         document.getElementById('see-result-btn').style.display = 'none';
-        
+
         // Reset to loading state
         document.getElementById('loading-spinner').style.display = 'inline-block';
         document.getElementById('success-icon').style.display = 'none';
@@ -1646,27 +1701,27 @@
         document.getElementById('loading-text').classList.remove('success');
 
         // Simulate assessment loading (2 seconds)
-        assessmentTimeout = setTimeout(function() {
+        assessmentTimeout = setTimeout(function () {
             // Update to success state
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('success-icon').style.display = 'inline-block';
             document.getElementById('loading-text').textContent = 'Assessment Complete!';
             document.getElementById('loading-text').classList.add('success');
-            
+
             // Switch buttons
             document.getElementById('cancel-btn').style.display = 'none';
             document.getElementById('see-result-btn').style.display = 'block';
         }, 2000);
     });
 
-    document.getElementById('cancel-btn').addEventListener('click', function() {
+    document.getElementById('cancel-btn').addEventListener('click', function () {
         var loadingScreen = document.getElementById('loading-screen');
         loadingScreen.classList.remove('active');
         pinVectorSource.clear();
         clearTimeout(assessmentTimeout);
     });
 
-    document.getElementById('see-result-btn').addEventListener('click', function() {
+    document.getElementById('see-result-btn').addEventListener('click', function () {
         var loadingScreen = document.getElementById('loading-screen');
         loadingScreen.classList.remove('active');
         var assessmentPanel = document.getElementById('assessment-panel');
@@ -1678,7 +1733,7 @@
         var barangayName = null;
         var floodRisk = null;
 
-        barangaysData.features.forEach(function(feature) {
+        barangaysData.features.forEach(function (feature) {
             var geom = new ol.format.GeoJSON().readGeometry(feature.geometry, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
@@ -1688,7 +1743,7 @@
             }
         });
 
-        floodData.features.forEach(function(feature) {
+        floodData.features.forEach(function (feature) {
             var geom = new ol.format.GeoJSON().readGeometry(feature.geometry, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
@@ -1732,68 +1787,68 @@
             <button id="generate-cert-btn" style="width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #1e3a5f); color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);">Generate Certificate</button>
         `;
         document.getElementById('assessment-content').innerHTML = content;
-        
+
         // Add event listeners for the buttons
-        document.getElementById('view-report-btn').addEventListener('click', function() {
+        document.getElementById('view-report-btn').addEventListener('click', function () {
             // Check if barangay and flood risk are valid
             if (barangayName === 'Unknown' || !barangayName) {
-                var errorUrl = '/maps/error/?title=' + encodeURIComponent('Invalid Location') + 
-                              '&message=' + encodeURIComponent('You clicked outside Silay City. Please select a location within Silay City to generate a report.') + 
-                              '&details=' + encodeURIComponent('Coordinates: (' + lonlat[0].toFixed(6) + ', ' + lonlat[1].toFixed(6) + ')');
+                var errorUrl = '/maps/error/?title=' + encodeURIComponent('Invalid Location') +
+                    '&message=' + encodeURIComponent('You clicked outside Silay City. Please select a location within Silay City to generate a report.') +
+                    '&details=' + encodeURIComponent('Coordinates: (' + lonlat[0].toFixed(6) + ', ' + lonlat[1].toFixed(6) + ')');
                 window.open(errorUrl, '_blank');
                 return;
             }
-            
-            var reportUrl = '/maps/report/?barangay=' + encodeURIComponent(barangayName || 'Unknown') + 
-                           '&lat=' + lonlat[1].toFixed(6) + 
-                           '&lon=' + lonlat[0].toFixed(6) + 
-                           '&risk=' + (floodRisk || 'Unknown');
+
+            var reportUrl = '/maps/report/?barangay=' + encodeURIComponent(barangayName || 'Unknown') +
+                '&lat=' + lonlat[1].toFixed(6) +
+                '&lon=' + lonlat[0].toFixed(6) +
+                '&risk=' + (floodRisk || 'Unknown');
             window.open(reportUrl, '_blank');
         });
-        
-        document.getElementById('view-report-btn').addEventListener('mouseenter', function() {
+
+        document.getElementById('view-report-btn').addEventListener('mouseenter', function () {
             this.style.background = 'linear-gradient(135deg, #1e3a5f, #2563eb)';
             this.style.transform = 'translateY(-2px)';
             this.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.3)';
         });
-        
-        document.getElementById('view-report-btn').addEventListener('mouseleave', function() {
+
+        document.getElementById('view-report-btn').addEventListener('mouseleave', function () {
             this.style.background = 'linear-gradient(135deg, #2563eb, #1e3a5f)';
             this.style.transform = 'translateY(0)';
             this.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.15)';
         });
-        
-        document.getElementById('generate-cert-btn').addEventListener('click', function() {
+
+        document.getElementById('generate-cert-btn').addEventListener('click', function () {
             // Check if barangay is valid
             if (barangayName === 'Unknown' || !barangayName) {
-                var errorUrl = '/maps/error/?title=' + encodeURIComponent('Invalid Location') + 
-                              '&message=' + encodeURIComponent('You clicked outside Silay City. Please select a location within Silay City to generate a certificate.') + 
-                              '&details=' + encodeURIComponent('Coordinates: (' + lonlat[0].toFixed(6) + ', ' + lonlat[1].toFixed(6) + ')');
+                var errorUrl = '/maps/error/?title=' + encodeURIComponent('Invalid Location') +
+                    '&message=' + encodeURIComponent('You clicked outside Silay City. Please select a location within Silay City to generate a certificate.') +
+                    '&details=' + encodeURIComponent('Coordinates: (' + lonlat[0].toFixed(6) + ', ' + lonlat[1].toFixed(6) + ')');
                 window.open(errorUrl, '_blank');
                 return;
             }
-            
-            var certUrl = '/maps/certificate/form/?barangay=' + encodeURIComponent(barangayName || 'Unknown') + 
-                         '&lat=' + lonlat[1].toFixed(6) + 
-                         '&lon=' + lonlat[0].toFixed(6) + 
-                         '&risk=' + (floodRisk || 'Unknown');
+
+            var certUrl = '/maps/certificate/form/?barangay=' + encodeURIComponent(barangayName || 'Unknown') +
+                '&lat=' + lonlat[1].toFixed(6) +
+                '&lon=' + lonlat[0].toFixed(6) +
+                '&risk=' + (floodRisk || 'Unknown');
             window.open(certUrl, '_blank');
         });
-        
-        document.getElementById('generate-cert-btn').addEventListener('mouseenter', function() {
+
+        document.getElementById('generate-cert-btn').addEventListener('mouseenter', function () {
             this.style.background = 'linear-gradient(135deg, #1e3a5f, #2563eb)';
             this.style.transform = 'translateY(-2px)';
             this.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.3)';
         });
-        
-        document.getElementById('generate-cert-btn').addEventListener('mouseleave', function() {
+
+        document.getElementById('generate-cert-btn').addEventListener('mouseleave', function () {
             this.style.background = 'linear-gradient(135deg, #2563eb, #1e3a5f)';
             this.style.transform = 'translateY(0)';
             this.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.15)';
         });
     });
 
-    document.getElementById('close-assessment').addEventListener('click', function() {
+    document.getElementById('close-assessment').addEventListener('click', function () {
         var assessmentPanel = document.getElementById('assessment-panel');
         assessmentPanel.classList.remove('active');
         pinVectorSource.clear();
@@ -1813,10 +1868,10 @@
             'orange': '#f97316',  // Moderate risk - orange
             'red': '#dc2626'      // High risk - red
         };
-        
+
         var highlightColor = colorMap[riskColor] || '#fbbf24';
         var rgb = hexToRgb(highlightColor);
-        
+
         return new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: highlightColor,
@@ -1847,18 +1902,18 @@
                 }
 
                 currentRiskData = data;
-                
+
                 // Apply highlighting to flood zones
                 floodVectorSource.getFeatures().forEach(feature => {
                     var hazCode = feature.get('haz_code');
-                    
+
                     // Check if this zone should be highlighted
                     if (data.zones_to_highlight.includes(hazCode)) {
                         // Save original style if not already saved
                         if (!originalFloodStyles.has(feature.ol_uid)) {
                             originalFloodStyles.set(feature.ol_uid, feature.getStyle());
                         }
-                        
+
                         // Apply highlighted style with animation
                         feature.setStyle(getHighlightedStyle(hazCode, data.risk_color));
                     } else {
@@ -1868,10 +1923,10 @@
                         }
                     }
                 });
-                
+
                 // Update risk banner
                 showRiskBanner(data);
-                
+
                 console.log('Map highlighting updated:', data.risk_level);
             })
             .catch(error => {
@@ -1885,11 +1940,11 @@
         var bannerContent = banner.querySelector('.risk-banner-content');
         var title = document.getElementById('risk-banner-title');
         var details = document.getElementById('risk-banner-details');
-        
+
         // Set banner style based on risk level
         bannerContent.className = 'risk-banner-content';
         var explanation = '';
-        
+
         if (data.risk_level === 'High Risk') {
             bannerContent.classList.add('risk-high');
             title.innerHTML = '<i class="fas fa-exclamation-circle"></i> HIGH FLOOD RISK ALERT';
@@ -1903,10 +1958,10 @@
             title.innerHTML = '<i class="fas fa-check-circle"></i> NORMAL CONDITIONS';
             explanation = 'All zones within safe parameters - routine monitoring';
         }
-        
+
         // Build details text
         var detailsText = '<strong>Current:</strong> Rainfall ' + data.rainfall_mm.toFixed(1) + 'mm | Tide ' + data.tide_m.toFixed(2) + 'm';
-        
+
         if (data.zones_to_highlight.length > 0) {
             var zoneNames = {
                 'VHF': 'Very High',
@@ -1920,11 +1975,11 @@
         } else {
             detailsText += '<br><small style="opacity: 0.9;">ℹ️ ' + explanation + '</small>';
         }
-        
+
         detailsText += '<br><small style="opacity: 0.75; font-size: 11px;">Updated: ' + data.timestamp + '</small>';
-        
+
         details.innerHTML = detailsText;
-        
+
         // Show banner
         banner.style.display = 'block';
     }
@@ -1941,7 +1996,7 @@
     setInterval(updateMapRiskHighlighting, 300000);
 
     // Manual refresh when user returns to map after checking monitoring page
-    document.addEventListener('visibilitychange', function() {
+    document.addEventListener('visibilitychange', function () {
         if (!document.hidden) {
             updateMapRiskHighlighting();
         }

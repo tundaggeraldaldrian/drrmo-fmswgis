@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+    <title>Special Flood Certification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            @page {
+                margin: 0;
+                size: letter;
+            }
+            
+            html, body {
+                width: 8.5in;
+                height: 11in;
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+            
+            body {
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            
+            .certificate-container {
+                margin: 0 !important;
+                padding: 0 0.6in !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                background: white !important;
+                min-height: 11in !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            
+            .header {
+                flex-shrink: 0;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            .header img {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            .content-wrapper {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            
+            .main-content {
+                flex-grow: 1;
+            }
+            
+            .footer {
+                flex-shrink: 0;
+                margin-top: auto;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #1a1a1a;
+            padding: 20px;
+            margin: 0;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        
+        .certificate-container {
+            width: 100%;
+            max-width: 850px;
+            background: white;
+            padding: 40px 60px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            min-height: 11in;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 0;
+            padding-top: 0;
+            flex-shrink: 0;
+        }
+        
+        .header img {
+            width: 100%;
+            max-width: 1150px;
+            margin-bottom: 2px;
+            margin-top: 0;
+            padding-top: 0;
+            display: block;
+        }
+        
+        .title {
+            text-align: center;
+            margin: 10px 0 35px 0;
+        }
+        
+        .title h1 {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-decoration: underline;
+            color: #000;
+            margin: 0;
+        }
+        
+        .content {
+            text-align: justify;
+            font-size: 16.5px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .content p {
+            margin-bottom: 25px;
+            text-indent: 50px;
+        }
+        
+        .content p:first-child {
+            margin-top: 0;
+        }
+        
+        .location, .hazard-level, .hazard-description, .suitability, .intended-purpose, .incident-record {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .whereas, .wherefore {
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        .issued-date {
+            margin-top: 5px;
+            text-indent: 50px;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .signature-block {
+            width: 45%;
+        }
+        
+        .signature-block p {
+            margin-bottom: 2px;
+        }
+        
+        .signature-line {
+            display: block;
+            width: 100%;
+            border-bottom: 2px solid #000;
+            margin-bottom: 5px;
+            height: 40px;
+        }
+        
+        .signatory-name {
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            margin-bottom: 1px;
+        }
+        
+        .signatory-title {
+            font-size: 13px;
+            margin-bottom: 0px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 2px solid #000;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+        
+        .footer p {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .print-btn, .close-btn {
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #2563eb, #1e3a5f);
+        }
+        
+        .close-btn {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+    </style>
+</head>
+<body>
+    <div class="action-buttons no-print">
+        <button class="close-btn" onclick="window.close()">✕ Cancel</button>
+        <button class="print-btn" onclick="window.print()">🖨️ Print Special Certification</button>
+    </div>
+    
+    <div class="certificate-container">
+        <div class="header">
+            <img src="{% static 'images/drrmo_header.png' %}" alt="Silay DRRMO Header">
+        </div>
+        
+        <div class="title">
+            <h1>CERTIFICATION</h1>
+        </div>
+        
+        <div class="content">
+            <p>
+                This is to certify that the area lot located at 
+                <span class="location">{{ purok_name }}, BARANGAY {{ barangay }}, SILAY CITY</span> 
+                was assessed by the Silay City Disaster Risk Reduction & Management Office (SCDRRMO) 
+                using MGB-DENR Map and Hazard Hunter Assessment Tool.
+            </p>
+            
+            <p>
+                <span class="whereas">WHEREAS</span>, the above-mentioned lot is under 
+                <span class="hazard-level">{{ flood_susceptibility }}</span> 
+                as per MGB DETAILED LANDSLIDE AND FLOOD HAZARD MAP OF SILAY CITY, 
+                NEGROS OCCIDENTAL, PHILIPPINES.
+            </p>
+            
+            <p>
+                <span class="whereas">WHEREAS</span>, <span class="incident-record">{{ incident_record }}</span> 
+                flooding incidents had been recorded and experienced as per record on 
+                historical data and past occurrences of Silay City DISASTER RISK REDUCTION 
+                AND MANAGEMENT OFFICE.
+            </p>
+            
+            <p>
+                <span class="wherefore">WHEREFORE</span>, upon the assessment and evaluation conducted by the 
+                Silay City Disaster Risk Reduction and Management Office (SCDRRMO), it has been determined 
+                that the area lot located at <span class="location">{{ purok_name }}, BARANGAY {{ barangay }}, SILAY CITY</span> 
+                is situated within a <span class="hazard-description">{{ flood_description }}</span>, 
+                and <span class="suitability">{{ suitability_status }}</span> for any 
+                <span class="intended-purpose">{{ intended_purpose }}</span>.
+            </p>
+            
+            <p class="issued-date" style="text-indent: 0;">
+                THIS CERTIFICATION is issued by the undersigned as per request by the name/organization/address 
+                mentioned above for whatever legal purposes it may serve.
+            </p>
+            
+            <p class="issued-date">
+                Issued this {{ issue_date }}, at Silay City Disaster Risk Reduction & Management Office, 
+                Silay City, Philippines.
+            </p>
+        </div>
+        
+        <div class="signature-section">
+             <div class="signature-block">
+                <p style="font-weight: bold; margin-bottom: 5px;">PREPARED BY:</p>
+                <div class="signature-line"></div>
+                <p class="signatory-name">{{ prepared_by_name }}</p>
+                <p class="signatory-title">{{ prepared_by_title }}</p>
+                <p class="signatory-title">Silay City DRRM Office</p>
+            </div>
+            
+            <div class="signature-block">
+                <p style="font-weight: bold; margin-bottom: 5px;">CERTIFIED BY:</p>
+                <div class="signature-line"></div>
+                <p class="signatory-name">{{ signatory_name }}</p>
+                <p class="signatory-title">{{ signatory_title }}</p>
+                <p class="signatory-title">{{ signatory_subtitle }}</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>SILAY CITY DISASTER RISK REDUCTION &amp; MANAGEMENT COUNCIL</p>
+        </div>
+    </div>
+</body>
+</html>

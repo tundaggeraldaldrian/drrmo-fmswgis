@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 <html>
+
 <head>
     <title>{% block title %}DRRMO Silay City{% endblock %}</title>
     <link rel="shortcut icon" href="{% static 'images/drrmo_logo.png' %}">
@@ -22,7 +23,7 @@
             max-width: 420px;
             /* allow interacting with toast notifications */
             pointer-events: auto;
-            
+
         }
 
         .toast-notification {
@@ -51,6 +52,7 @@
                 transform: translateX(120%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -62,6 +64,7 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+
             to {
                 transform: translateX(120%);
                 opacity: 0;
@@ -73,17 +76,21 @@
             border-left-color: #10b981;
             background: linear-gradient(to right, #ecfdf5, #ffffff);
         }
+
         .toast-success .toast-icon {
             color: #10b981;
             background: #d1fae5;
         }
 
         /* Error/Danger Toast */
-        .toast-error, .toast-danger {
+        .toast-error,
+        .toast-danger {
             border-left-color: #ef4444;
             background: linear-gradient(to right, #fef2f2, #ffffff);
         }
-        .toast-error .toast-icon, .toast-danger .toast-icon {
+
+        .toast-error .toast-icon,
+        .toast-danger .toast-icon {
             color: #ef4444;
             background: #fee2e2;
         }
@@ -93,6 +100,7 @@
             border-left-color: #f59e0b;
             background: linear-gradient(to right, #fffbeb, #ffffff);
         }
+
         .toast-warning .toast-icon {
             color: #f59e0b;
             background: #fef3c7;
@@ -103,6 +111,7 @@
             border-left-color: #3b82f6;
             background: linear-gradient(to right, #eff6ff, #ffffff);
         }
+
         .toast-info .toast-icon {
             color: #3b82f6;
             background: #dbeafe;
@@ -145,11 +154,13 @@
             align-items: center;
             justify-content: center;
             pointer-events: auto;
-            z-index: 99999; /* keep toast above other UI overlays */
+            z-index: 99999;
+            /* keep toast above other UI overlays */
             transition: all 0.2s;
             flex-shrink: 0;
             pointer-events: auto;
-            z-index: 100000; /* ensure close button is clickable */
+            z-index: 100000;
+            /* ensure close button is clickable */
         }
 
         .toast-close:hover {
@@ -172,6 +183,7 @@
             from {
                 width: 100%;
             }
+
             to {
                 width: 0%;
             }
@@ -185,120 +197,138 @@
                 left: 12px;
                 max-width: none;
             }
+
             .toast-notification {
                 min-width: auto;
                 max-width: none;
             }
         }
 
-                /* Footer Styles */
-                footer {
-                    background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
-                    color: white;
-                    margin-top: auto;
-                    border-top: 1px solid rgba(255, 255, 255, 0.1);
-                    width: 100%;
-                    box-shadow: 0 -4px 12px rgba(30, 58, 95, 0.1);
-                }
-                .footer-container {
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    padding: 70px 40px 30px 40px;
-                }
-                .footer-content {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                    gap: 40px;
-                    margin-bottom: 40px;
-                }
-                .footer-section h3 {
-                    font-size: 17px;
-                    font-weight: 800;
-                    margin-bottom: 20px;
-                    letter-spacing: 0.3px;
-                    color: #ffffff;
-                }
-                .footer-section p {
-                    font-size: 14px;
-                    line-height: 1.7;
-                    opacity: 0.9;
-                    margin-bottom: 12px;
-                }
-                .footer-section a {
-                    color: rgba(255, 255, 255, 0.85);
-                    text-decoration: none;
-                    font-size: 14px;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    margin-bottom: 10px;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .footer-section a:hover {
-                    color: white;
-                    transform: translateX(4px);
-                }
-                .social-links {
-                    display: flex;
-                    gap: 12px;
-                    margin-top: 12px;
-                }
-                .social-links a {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 40px;
-                    height: 40px;
-                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
-                    border: 1px solid rgba(255, 255, 255, 0.15);
-                    border-radius: 10px;
-                    color: white;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    margin-bottom: 0;
-                }
-                .social-links a:hover {
-                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
-                    transform: translateY(-3px);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                }
-                .footer-divider {
-                    height: 1px;
-                    background-color: rgba(255,255,255,0.1);
-                    margin: 30px 0;
-                }
-                .footer-bottom {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    font-size: 13px;
-                    opacity: 0.8;
-                    flex-wrap: wrap;
-                    gap: 16px;
-                }
-                @media (max-width: 900px) {
-                    .footer-content {
-                        grid-template-columns: 1fr 1fr;
-                        gap: 30px;
-                    }
-                    .footer-container {
-                        padding: 40px 20px 20px 20px;
-                    }
-                }
-                @media (max-width: 600px) {
-                    .footer-content {
-                        grid-template-columns: 1fr;
-                        gap: 24px;
-                    }
-                    .footer-container {
-                        padding: 30px 16px 16px 16px;
-                    }
-                    .footer-bottom {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        gap: 8px;
-                    }
-                }
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
+            color: white;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            box-shadow: 0 -4px 12px rgba(30, 58, 95, 0.1);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 70px 40px 30px 40px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: 0.3px;
+            color: #ffffff;
+        }
+
+        .footer-section p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-section a:hover {
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: white;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0;
+        }
+
+        .social-links a:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .footer-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 30px 0;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.8;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+
+            .footer-container {
+                padding: 40px 20px 20px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .footer-container {
+                padding: 30px 16px 16px 16px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
         :root {
             --primary-blue: #1e3a5f;
             --secondary-blue: #2563eb;
@@ -307,9 +337,11 @@
             --text-dark: #1e293b;
             --text-muted: #64748b;
         }
+
         html {
             scroll-behavior: smooth;
         }
+
         body {
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
             background-color: #ffffff;
@@ -321,6 +353,7 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+
         .navbar {
             width: 100%;
             background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
@@ -345,22 +378,26 @@
             box-shadow: 0 8px 24px rgba(30, 58, 95, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1);
             background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
         }
+
         .navbar-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .navbar-logo {
             height: 40px;
             width: 40px;
             border-radius: 8px;
         }
+
         .navbar-title-wrapper {
             display: flex;
             flex-direction: column;
             gap: 2px;
             line-height: 1.2;
         }
+
         .navbar-title {
             font-size: 22px;
             font-weight: 800;
@@ -370,17 +407,20 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .navbar-subtitle {
             font-size: 11px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.75);
             letter-spacing: 0.3px;
         }
+
         .navbar-center {
             display: flex;
             align-items: center;
             gap: 24px;
         }
+
         .nav-link {
             color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
@@ -395,6 +435,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
+
         .nav-link::before {
             content: '';
             position: absolute;
@@ -408,20 +449,26 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: -1;
         }
-        .nav-link:hover, .nav-link.active {
+
+        .nav-link:hover,
+        .nav-link.active {
             color: white;
             text-decoration: none;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-        .nav-link:hover::before, .nav-link.active::before {
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
             transform: scaleX(1);
         }
+
         .dropdown-toggle {
             cursor: pointer;
             pointer-events: auto;
             position: relative;
         }
+
         .dropdown-toggle::after {
             content: '▼';
             font-size: 10px;
@@ -429,9 +476,11 @@
             display: inline-block;
             opacity: 0.8;
         }
+
         .dropdown {
             position: relative;
         }
+
         .dropdown-content {
             display: none;
             position: absolute;
@@ -447,20 +496,24 @@
             margin-top: 12px;
             border: 2px solid rgba(37, 99, 235, 0.1);
         }
+
         .dropdown.active .dropdown-content {
             display: block;
             animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+
         @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-12px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
         }
+
         .dropdown-content a {
             color: var(--text-dark);
             padding: 14px 20px;
@@ -473,23 +526,28 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 3px solid transparent;
         }
+
         .dropdown-content a:hover {
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             color: var(--secondary-blue);
             padding-left: 24px;
             border-left-color: var(--secondary-blue);
         }
+
         .dropdown-content a i {
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .dropdown-content a:hover i {
             transform: scale(1.2) translateX(2px);
         }
+
         .navbar-right {
             display: flex;
             align-items: center;
             gap: 16px;
         }
+
         .settings-btn {
             background: rgba(255, 255, 255, 0.12);
             border: none;
@@ -501,15 +559,19 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
-        .settings-btn:hover, .settings-btn:focus {
+
+        .settings-btn:hover,
+        .settings-btn:focus {
             background: rgba(255, 255, 255, 0.22);
             outline: none;
             transform: scale(1.08) rotate(45deg);
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
+
         .settings-btn:active {
             transform: scale(0.95) rotate(45deg);
         }
+
         .settings-btn::after {
             content: '';
             position: absolute;
@@ -522,10 +584,12 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 0.4s ease;
         }
+
         .settings-btn:hover::after {
             transform: translate(-50%, -50%) scale(1.5);
             opacity: 0;
         }
+
         .settings-dropdown {
             display: none;
             position: absolute;
@@ -541,10 +605,13 @@
             margin-top: 8px;
             border: 1px solid rgba(226, 232, 240, 0.5);
         }
-        .settings-btn:focus + .settings-dropdown, .settings-btn.active + .settings-dropdown {
+
+        .settings-btn:focus+.settings-dropdown,
+        .settings-btn.active+.settings-dropdown {
             display: block;
             animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .settings-dropdown a {
             color: var(--text-dark);
             padding: 12px 18px;
@@ -554,11 +621,13 @@
             font-weight: 500;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .settings-dropdown a:hover {
             background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
             color: var(--secondary-blue);
             padding-left: 20px;
         }
+
         .main-content {
             flex: 1;
             width: 100%;
@@ -567,6 +636,7 @@
             box-sizing: border-box;
             max-width: 1200px;
         }
+
         @media (max-width: 900px) {
             .navbar {
                 flex-direction: column;
@@ -574,45 +644,56 @@
                 padding: 12px 16px;
                 min-height: auto;
             }
+
             .navbar-center {
                 justify-content: center;
                 gap: 8px;
                 flex-wrap: wrap;
             }
+
             .nav-link {
                 padding: 12px 16px;
                 min-height: 44px;
                 font-size: 14px;
             }
+
             .main-content {
                 padding: 24px 16px;
             }
         }
+
         @media (max-width: 600px) {
             .navbar-title {
                 font-size: 18px;
             }
+
             .navbar-subtitle {
                 font-size: 10px;
             }
+
             .navbar-logo {
                 height: 36px;
                 width: 36px;
             }
+
             .nav-link {
                 font-size: 13px;
                 padding: 10px 14px;
             }
+
             .main-content {
                 padding: 20px 12px;
             }
+
             .dropdown-content {
                 min-width: calc(100vw - 32px);
                 left: 16px;
                 right: 16px;
             }
         }
+
         @media (prefers-reduced-motion: reduce) {
+
             *,
             *::before,
             *::after {
@@ -629,7 +710,8 @@
     <!-- Modern Top Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-left">
-            <a href="{% url 'home' %}" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
+            <a href="{% url 'home' %}"
+                style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
                 <img src="{% static 'images/drrmo_logo.png' %}" alt="SCDRRMO Logo" class="navbar-logo">
                 <div class="navbar-title-wrapper">
                     <span class="navbar-title">SCDRRMO</span>
@@ -640,24 +722,20 @@
         <div class="navbar-center">
             <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="{% url 'map_view' %}" class="nav-link"><i class="fas fa-map"></i> Map</a>
+            <a href="{% url 'monitoring_view' %}" class="nav-link"><i class="fas fa-chart-area"></i> Monitoring</a>
+            <a href="{% url 'flood_records_list' %}" class="nav-link"><i class="fas fa-list"></i> Flood Records</a>
+            {% if user.is_staff %}
+            <a href="{% url 'approve_users' %}" class="nav-link"><i class="fas fa-user-check"></i> User Approvals</a>
             <div class="dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-dropdown="monitoring"><i class="fas fa-chart-area"></i> Monitoring</a>
+                <a href="#" class="nav-link dropdown-toggle" data-dropdown="activity"><i class="fas fa-history"></i>
+                    Activity History</a>
                 <div class="dropdown-content">
-                    <a href="{% url 'monitoring_view' %}"><i class="fas fa-chart-area"></i> Monitoring Page</a>
-                    <a href="{% url 'monitoring_view' %}#flood-records"><i class="fas fa-list"></i> Flood Records</a>
+                    <a href="{% url 'my_activity' %}"><i class="fas fa-user"></i> Your Activity History</a>
+                    <a href="{% url 'all_activities' %}"><i class="fas fa-list"></i> All Activities</a>
                 </div>
             </div>
-            {% if user.is_staff %}
-                <a href="{% url 'approve_users' %}" class="nav-link"><i class="fas fa-user-check"></i> User Approvals</a>
-                <div class="dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-dropdown="activity"><i class="fas fa-history"></i> Activity History</a>
-                    <div class="dropdown-content">
-                        <a href="{% url 'my_activity' %}"><i class="fas fa-user"></i> Your Activity History</a>
-                        <a href="{% url 'all_activities' %}"><i class="fas fa-list"></i> All Activities</a>
-                    </div>
-                </div>
             {% else %}
-                <a href="{% url 'my_activity' %}" class="nav-link"><i class="fas fa-history"></i> Activity History</a>
+            <a href="{% url 'my_activity' %}" class="nav-link"><i class="fas fa-history"></i> Activity History</a>
             {% endif %}
         </div>
         <div class="navbar-right">
@@ -666,7 +744,7 @@
                 <div class="settings-dropdown" id="settingsDropdown">
                     <a href="{% url 'view_profile' %}"><i class="fas fa-user"></i> Profile</a>
                     {% if user.is_staff %}
-                        <a href="{% url 'benchmark_settings' %}"><i class="fas fa-sliders-h"></i> Benchmark Settings</a>
+                    <a href="{% url 'benchmark_settings' %}"><i class="fas fa-sliders-h"></i> Benchmark Settings</a>
                     {% endif %}
                     <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
@@ -688,7 +766,8 @@
                 <!-- About Section -->
                 <div class="footer-section">
                     <h3><i class="fas fa-shield-alt"></i> DRRMO Silay City</h3>
-                    <p>Disaster Risk Reduction and Management Office dedicated to protecting the community of Silay City through comprehensive disaster preparedness and response.</p>
+                    <p>Disaster Risk Reduction and Management Office dedicated to protecting the community of Silay City
+                        through comprehensive disaster preparedness and response.</p>
                 </div>
                 <!-- Contact Section -->
                 <div class="footer-section">
@@ -703,25 +782,31 @@
                 <div class="footer-section">
                     <h3><i class="fas fa-clock"></i> Office Hours</h3>
                     <p><strong>Certificates & Documents:</strong><br>Monday - Friday<br>8:00 AM - 5:00 PM</p>
-                    <p style="margin-top: 12px;"><strong>Emergency Response & Medical Assistance:</strong><br>Monday - Sunday<br>24/7, Including Holidays</p>
+                    <p style="margin-top: 12px;"><strong>Emergency Response & Medical Assistance:</strong><br>Monday -
+                        Sunday<br>24/7, Including Holidays</p>
                 </div>
                 <!-- Data Sources Section -->
                 <div class="footer-section">
                     <h3><i class="fas fa-database"></i> Data Sources</h3>
                     <p><strong>Flood Risk Susceptibility:</strong></p>
-                    <a href="https://geoanalytics.georisk.gov.ph/" target="_blank"><i class="fas fa-external-link-alt"></i> GeoAnalytics</a>
-                    <a href="https://hazardhunter.georisk.gov.ph/" target="_blank"><i class="fas fa-external-link-alt"></i> HazardHunter PH</a>
+                    <a href="https://geoanalytics.georisk.gov.ph/" target="_blank"><i
+                            class="fas fa-external-link-alt"></i> GeoAnalytics</a>
+                    <a href="https://hazardhunter.georisk.gov.ph/" target="_blank"><i
+                            class="fas fa-external-link-alt"></i> HazardHunter PH</a>
                     <p style="margin-top: 12px;"><strong>Weather Data:</strong></p>
-                    <a href="https://open-meteo.com/" target="_blank"><i class="fas fa-external-link-alt"></i> Open-Meteo API</a>
+                    <a href="https://open-meteo.com/" target="_blank"><i class="fas fa-external-link-alt"></i>
+                        Open-Meteo API</a>
                     <p style="margin-top: 12px;"><strong>Tidal Data:</strong></p>
-                    <a href="https://www.worldtides.info/home" target="_blank"><i class="fas fa-external-link-alt"></i> World Tides</a>
+                    <a href="https://www.worldtides.info/home" target="_blank"><i class="fas fa-external-link-alt"></i>
+                        World Tides</a>
                 </div>
                 <!-- Social Media Section -->
                 <div class="footer-section">
                     <h3><i class="fas fa-share-alt"></i> Facebook</h3>
                     <p>Stay updated with our latest news and alerts</p>
                     <div class="social-links">
-                        <a href="https://www.facebook.com/silaycitydrrmoffice" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.facebook.com/silaycitydrrmoffice" target="_blank" title="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
                     </div>
                 </div>
             </div>
@@ -729,8 +814,11 @@
             <div class="footer-bottom">
                 <p>&copy; 2025 DRRMO Silay City. All rights reserved.</p>
                 <div>
-                    <a href="{% url 'privacy_policy' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; margin-right: 16px;">Privacy Policy</a>
-                    <a href="{% url 'terms_of_service' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">Terms of Service</a>
+                    <a href="{% url 'privacy_policy' %}"
+                        style="color: rgba(255, 255, 255, 0.8); text-decoration: none; margin-right: 16px;">Privacy
+                        Policy</a>
+                    <a href="{% url 'terms_of_service' %}"
+                        style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -742,7 +830,7 @@
         // ============================================
         function showToast(message, type = 'info', duration = 5000) {
             const container = document.getElementById('toastContainer');
-            
+
             // Icon mapping
             const icons = {
                 success: 'fa-check-circle',
@@ -751,7 +839,7 @@
                 warning: 'fa-exclamation-triangle',
                 info: 'fa-info-circle'
             };
-            
+
             // Create toast element
             const toast = document.createElement('div');
             toast.className = `toast-notification toast-${type}`;
@@ -767,55 +855,55 @@
                 </button>
                 <div class="toast-progress"></div>
             `;
-            
+
             container.appendChild(toast);
-            
+
             // Auto-dismiss after duration
             const timer = setTimeout(() => {
                 dismissToast(toast.querySelector('.toast-close'));
             }, duration);
-            
+
             // Store timer for manual dismissal
             toast.dataset.timer = timer;
-            
+
             return toast;
         }
-        
+
         function dismissToast(button) {
             const toast = button.closest('.toast-notification');
             if (!toast) return;
-            
+
             // Clear auto-dismiss timer
             if (toast.dataset.timer) {
                 clearTimeout(parseInt(toast.dataset.timer));
             }
-            
+
             // Add hiding animation
             toast.classList.add('hiding');
-            
+
             // Remove from DOM after animation
             setTimeout(() => {
                 toast.remove();
             }, 400);
         }
-        
+
         // Display Django messages as toasts on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             {% if messages %}
-                {% for message in messages %}
-                    showToast(
-                        "{{ message|escapejs }}", 
-                        "{{ message.tags|default:'info' }}",
-                        5000
-                    );
-                {% endfor %}
+            {% for message in messages %}
+            showToast(
+                "{{ message|escapejs }}",
+                "{{ message.tags|default:'info' }}",
+                5000
+            );
+            {% endfor %}
             {% endif %}
         });
 
         // Settings dropdown toggle for accessibility
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsDropdown = document.getElementById('settingsDropdown');
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (settingsBtn.contains(event.target)) {
                 settingsDropdown.style.display = settingsDropdown.style.display === 'block' ? 'none' : 'block';
                 settingsBtn.classList.toggle('active');
@@ -828,24 +916,24 @@
         // Dropdown click toggle for Monitoring and Activity History
         const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
         dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
+            toggle.addEventListener('click', function (e) {
                 e.preventDefault();
                 const parentDropdown = this.closest('.dropdown');
-                
+
                 // Close other dropdowns
                 document.querySelectorAll('.dropdown').forEach(dropdown => {
                     if (dropdown !== parentDropdown) {
                         dropdown.classList.remove('active');
                     }
                 });
-                
+
                 // Toggle current dropdown
                 parentDropdown.classList.toggle('active');
             });
         });
 
         // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!event.target.closest('.dropdown')) {
                 document.querySelectorAll('.dropdown').forEach(dropdown => {
                     dropdown.classList.remove('active');
@@ -863,7 +951,7 @@
 
         // Enhanced navbar sticky scroll effect
         const navbar = document.querySelector('.navbar');
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             if (window.scrollY > 5) {
                 navbar.classList.add('scrolled');
             } else {
@@ -874,4 +962,5 @@
 
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

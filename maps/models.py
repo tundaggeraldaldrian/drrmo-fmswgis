@@ -105,6 +105,18 @@ class CertificateRecord(models.Model):
     longitude = models.DecimalField(max_digits=10, decimal_places=6, verbose_name="Longitude")
     flood_susceptibility = models.CharField(max_length=100, verbose_name="Flood Susceptibility")
     zone_status = models.CharField(max_length=100, verbose_name="Zone Status")
+    # NEW: Certification Type and Special Form Fields
+    CERTIFICATE_TYPE_CHOICES = [
+        ('STANDARD', 'Standard Certificate'),
+        ('SPECIAL', 'Special Certification (Restriction)'),
+    ]
+    certificate_type = models.CharField(max_length=20, choices=CERTIFICATE_TYPE_CHOICES, default='STANDARD', verbose_name="Certificate Type")
+    
+    purok_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Purok Name")
+    incident_record = models.CharField(max_length=100, blank=True, null=True, verbose_name="Incident Record")
+    intended_purpose = models.CharField(max_length=200, blank=True, null=True, verbose_name="Intended Purpose")
+    is_suitable = models.BooleanField(default=True, verbose_name="Is Suitable")
+
     issue_date = models.CharField(max_length=100, verbose_name="Issue Date")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Certificate Generated Date/Time")
     is_archived = models.BooleanField(default=False, verbose_name="Archived", db_index=True)

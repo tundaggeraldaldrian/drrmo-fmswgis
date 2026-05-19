@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Add Flood Record</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -121,7 +122,11 @@
             color: var(--secondary-blue);
         }
 
-        .form-control, select, input[type="date"], input[type="text"], input[type="number"] {
+        .form-control,
+        select,
+        input[type="date"],
+        input[type="text"],
+        input[type="number"] {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border-gray);
@@ -154,7 +159,11 @@
             padding: 4px;
         }
 
-        .form-control:focus, select:focus, input[type="date"]:focus, input[type="text"]:focus, input[type="number"]:focus {
+        .form-control:focus,
+        select:focus,
+        input[type="date"]:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus {
             outline: none;
             border-color: var(--secondary-blue);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -437,7 +446,8 @@
             border-top: 1px solid var(--border-gray);
         }
 
-        .btn-primary, .btn-secondary {
+        .btn-primary,
+        .btn-secondary {
             padding: 12px 24px;
             border: none;
             border-radius: 10px;
@@ -530,7 +540,8 @@
                 flex-direction: column;
             }
 
-            .btn-primary, .btn-secondary {
+            .btn-primary,
+            .btn-secondary {
                 width: 100%;
                 justify-content: center;
             }
@@ -541,6 +552,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="content-wrapper">
         <div class="page-header">
@@ -554,7 +566,7 @@
         <div class="form-container">
             <form method="post">
                 {% csrf_token %}
-                
+
                 <!-- Date field -->
                 <div class="form-group">
                     <label for="id_date">
@@ -563,11 +575,11 @@
                     </label>
                     {{ form.date }}
                     {% if form.date.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.date.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="errorlist">
+                        {% for error in form.date.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                     {% endif %}
                 </div>
 
@@ -579,11 +591,11 @@
                     </label>
                     {{ form.event }}
                     {% if form.event.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.event.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="errorlist">
+                        {% for error in form.event.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                     {% endif %}
                 </div>
 
@@ -598,15 +610,20 @@
                             -- Select Barangays --
                         </div>
                         <div class="barangay-dropdown-menu" id="barangay-dropdown-menu">
-                            <div class="barangay-dropdown-item" style="background: #f0f9ff; border-bottom: 2px solid var(--secondary-blue);">
-                                <input type="checkbox" id="checkbox-select-all" name="barangay-checkbox-select-all" value="select-all">
-                                <label for="checkbox-select-all" style="font-weight: 700; color: var(--secondary-blue);">✓ Select All Barangays</label>
+                            <div class="barangay-dropdown-item"
+                                style="background: #f0f9ff; border-bottom: 2px solid var(--secondary-blue);">
+                                <input type="checkbox" id="checkbox-select-all" name="barangay-checkbox-select-all"
+                                    value="select-all">
+                                <label for="checkbox-select-all"
+                                    style="font-weight: 700; color: var(--secondary-blue);">✓ Select All
+                                    Barangays</label>
                             </div>
                             {% for barangay_value, barangay_name in BARANGAYS %}
-                                <div class="barangay-dropdown-item">
-                                    <input type="checkbox" id="checkbox-{{ barangay_value }}" name="barangay-checkbox" value="{{ barangay_value }}" data-barangay-name="{{ barangay_name }}">
-                                    <label for="checkbox-{{ barangay_value }}">{{ barangay_name }}</label>
-                                </div>
+                            <div class="barangay-dropdown-item">
+                                <input type="checkbox" id="checkbox-{{ barangay_value }}" name="barangay-checkbox"
+                                    value="{{ barangay_value }}" data-barangay-name="{{ barangay_name }}">
+                                <label for="checkbox-{{ barangay_value }}">{{ barangay_name }}</label>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -619,25 +636,28 @@
                         Affected Barangays
                     </label>
                     <div class="barangay-input-container">
-                        <input type="text" id="id_affected_barangays" name="affected_barangays" readonly value="{{ form.affected_barangays.value|default:'' }}" />
+                        <input type="text" id="id_affected_barangays" name="affected_barangays" readonly
+                            value="{{ form.affected_barangays.value|default:'' }}" />
                         <div id="barangay-tags" class="barangay-tags"></div>
                     </div>
                     {% if form.affected_barangays.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.affected_barangays.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="errorlist">
+                        {% for error in form.affected_barangays.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                     {% endif %}
                     <small>Select barangays from the dropdown above</small>
                 </div>
 
                 <!-- Barangay-specific data collection section -->
                 <div id="barangay-data-section" style="display: none; margin-top: 30px;">
-                    <h3 style="color: var(--primary-blue); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--secondary-blue);">
+                    <h3
+                        style="color: var(--primary-blue); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--secondary-blue);">
                         <i class="fas fa-table"></i> Barangay-Specific Data
                     </h3>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Enter details for each affected barangay. Click on a barangay to expand and fill in the data.</p>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Enter details for each affected barangay.
+                        Click on a barangay to expand and fill in the data.</p>
                     <div id="barangay-panels"></div>
                     <input type="hidden" id="barangay_data_json" name="barangay_data_json" value="">
                 </div>
@@ -648,10 +668,11 @@
                         <i class="fas fa-money-bill-wave"></i>
                         Total Damage (PHP)
                     </label>
-                    <input type="text" id="damage_total_php_display" class="form-control" readonly value="₱0.00" style="background-color: #f8f9fa; font-weight: 600; color: #059669;">
+                    <input type="text" id="damage_total_php_display" class="form-control" readonly value="₱0.00"
+                        style="background-color: #f8f9fa; font-weight: 600; color: #059669;">
                     <small>Auto-calculated from all barangay damage entries</small>
                 </div>
-            
+
                 <div class="btn-wrapper">
                     <button type="button" onclick="history.back()" class="btn-secondary">
                         <i class="fas fa-times"></i>
@@ -668,7 +689,7 @@
 
     <!-- Toast container -->
     <div class="toast-container"></div>
-    
+
     <template id="successToastTemplate">
         <div class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -698,7 +719,7 @@
             const template = document.getElementById(type === 'success' ? 'successToastTemplate' : 'errorToastTemplate');
             const toast = template.content.cloneNode(true).firstElementChild;
             toast.querySelector('.toast-body').textContent = message;
-            
+
             toastContainer.appendChild(toast);
             const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
             bsToast.show();
@@ -758,7 +779,7 @@
             return isValid;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             markRequiredFields();
 
             const dropdownToggle = document.getElementById('barangay-dropdown-toggle');
@@ -769,13 +790,13 @@
             const barangayTags = document.getElementById('barangay-tags');
 
             // Toggle dropdown
-            dropdownToggle.addEventListener('click', function(e) {
+            dropdownToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
                 dropdownMenu.classList.toggle('show');
                 dropdownToggle.classList.toggle('active');
             });
 
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (!e.target.closest('.barangay-dropdown-wrapper')) {
                     dropdownMenu.classList.remove('show');
                     dropdownToggle.classList.remove('active');
@@ -783,7 +804,7 @@
             });
 
             // Select All
-            selectAllCheckbox.addEventListener('change', function() {
+            selectAllCheckbox.addEventListener('change', function () {
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = this.checked;
                 });
@@ -794,20 +815,20 @@
 
             // Individual checkboxes
             checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('change', function () {
                     const selectedBarangays = Array.from(checkboxes)
                         .filter(cb => cb.checked)
                         .map(cb => cb.value);
-                    
+
                     affectedInput.value = selectedBarangays.join(', ');
                     updateBarangayTags(selectedBarangays);
                     updateBarangayDataPanels(selectedBarangays);
-                    
+
                     const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
                     const someChecked = Array.from(checkboxes).some(cb => cb.checked);
                     selectAllCheckbox.checked = allChecked;
                     selectAllCheckbox.indeterminate = someChecked && !allChecked;
-                    
+
                     affectedInput.classList.remove('is-invalid');
                     const errorFeedback = affectedInput.parentNode.querySelector('.invalid-feedback');
                     if (errorFeedback) {
@@ -830,15 +851,15 @@
             function addBarangayTag(barangayValue, barangayName) {
                 const tag = document.createElement('span');
                 tag.className = 'barangay-tag';
-                
+
                 const tagText = document.createElement('span');
                 tagText.textContent = barangayName;
                 tag.appendChild(tagText);
-                
+
                 const removeButton = document.createElement('span');
                 removeButton.className = 'remove-barangay';
                 removeButton.textContent = '×';
-                removeButton.addEventListener('click', function(e) {
+                removeButton.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const checkbox = document.querySelector(`input[value="${barangayValue}"]`);
                     if (checkbox) {
@@ -853,16 +874,16 @@
             function updateBarangayDataPanels(selectedBarangays) {
                 const section = document.getElementById('barangay-data-section');
                 const panelsContainer = document.getElementById('barangay-panels');
-                
+
                 if (selectedBarangays.length === 0) {
                     section.style.display = 'none';
                     panelsContainer.innerHTML = '';
                     return;
                 }
-                
+
                 section.style.display = 'block';
                 panelsContainer.innerHTML = '';
-                
+
                 selectedBarangays.forEach(barangayValue => {
                     const checkbox = document.querySelector(`input[value="${barangayValue}"]`);
                     const barangayName = checkbox ? checkbox.getAttribute('data-barangay-name') : barangayValue;
@@ -877,17 +898,17 @@
                 const panel = document.createElement('div');
                 panel.className = 'barangay-panel';
                 panel.setAttribute('data-barangay', barangayValue);
-                
+
                 const header = document.createElement('div');
                 header.className = 'barangay-panel-header';
                 header.innerHTML = `
                     <span><i class="fas fa-map-marker-alt"></i> ${barangayName}</span>
                     <i class="fas fa-chevron-down"></i>
                 `;
-                
+
                 const body = document.createElement('div');
                 body.className = 'barangay-panel-body';
-                
+
                 body.innerHTML = `
                     <div class="barangay-data-grid">
                         <div class="data-section-title">👥 Casualties</div>
@@ -943,17 +964,17 @@
                         </div>
                     </div>
                 `;
-                
-                header.addEventListener('click', function() {
+
+                header.addEventListener('click', function () {
                     header.classList.toggle('active');
                     body.classList.toggle('show');
                 });
-                
+
                 const damageInputs = body.querySelectorAll('input[data-field^="damage_"]');
                 damageInputs.forEach(input => {
                     input.addEventListener('input', calculateTotalDamage);
                 });
-                
+
                 panel.appendChild(header);
                 panel.appendChild(body);
                 return panel;
@@ -962,31 +983,31 @@
             function collectBarangayData() {
                 const barangayData = {};
                 const panels = document.querySelectorAll('.barangay-panel');
-                
+
                 panels.forEach(panel => {
                     const barangay = panel.getAttribute('data-barangay');
                     const inputs = panel.querySelectorAll('input[data-field]');
-                    
+
                     if (!barangayData[barangay]) {
                         barangayData[barangay] = {};
                     }
-                    
+
                     inputs.forEach(input => {
                         const field = input.getAttribute('data-field');
                         const value = parseFloat(input.value) || 0;
                         barangayData[barangay][field] = value;
                     });
                 });
-                
+
                 return barangayData;
             }
-            
+
             function validateBarangayData(barangayData) {
                 const emptyBarangays = [];
-                
+
                 for (const [barangay, data] of Object.entries(barangayData)) {
                     let hasData = false;
-                    
+
                     // Check if any field has non-zero value
                     for (const value of Object.values(data)) {
                         if (value > 0) {
@@ -994,14 +1015,14 @@
                             break;
                         }
                     }
-                    
+
                     if (!hasData) {
                         const checkbox = document.querySelector(`input[value="${barangay}"]`);
                         const barangayName = checkbox ? checkbox.getAttribute('data-barangay-name') : barangay;
                         emptyBarangays.push(barangayName);
                     }
                 }
-                
+
                 return emptyBarangays;
             }
 
@@ -1012,7 +1033,7 @@
                     'damage_institutions_php',
                     'damage_private_commercial_php'
                 ];
-                
+
                 let total = 0;
                 const panels = document.querySelectorAll('.barangay-panel');
                 panels.forEach(panel => {
@@ -1023,28 +1044,28 @@
                         }
                     });
                 });
-                
+
                 const displayField = document.getElementById('damage_total_php_display');
                 if (displayField) {
-                    displayField.value = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    displayField.value = `₱${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 }
-                
+
                 return total;
             }
 
             // Form submit
             const form = document.querySelector('form');
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 const barangayData = collectBarangayData();
-                
+
                 // Check if at least one barangay is selected
                 if (Object.keys(barangayData).length === 0) {
                     showToast('Please select at least one affected barangay', 'error');
                     return;
                 }
-                
+
                 // Validate that all selected barangays have data
                 const emptyBarangays = validateBarangayData(barangayData);
                 if (emptyBarangays.length > 0) {
@@ -1052,7 +1073,7 @@
                     showToast(`The following barangays have no data entered. Please enter data or remove them from the selection:\n\n${barangayList}`, 'error');
                     return;
                 }
-                
+
                 document.getElementById('barangay_data_json').value = JSON.stringify(barangayData);
 
                 // Validation
@@ -1060,7 +1081,7 @@
                 for (const [barangay, data] of Object.entries(barangayData)) {
                     const persons = data.affected_persons || 0;
                     const families = data.affected_families || 0;
-                    
+
                     if (families > 0 && persons < families) {
                         const barangayName = document.querySelector(`input[value="${barangay}"]`)?.getAttribute('data-barangay-name') || barangay;
                         validationErrors.push(`${barangayName}: Affected persons (${persons}) must be at least equal to affected families (${families})`);
@@ -1095,35 +1116,36 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message || 'Record saved successfully', 'success');
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url;
-                        }, 2000);
-                    } else {
-                        showToast(data.message || 'Error saving form', 'error');
-                        if (data.errors) {
-                            Object.entries(data.errors).forEach(([field, errors]) => {
-                                const input = document.getElementById(`id_${field}`);
-                                if (input) {
-                                    input.classList.add('is-invalid');
-                                    const feedbackDiv = document.createElement('div');
-                                    feedbackDiv.className = 'invalid-feedback';
-                                    feedbackDiv.textContent = errors.join(', ');
-                                    input.parentNode.appendChild(feedbackDiv);
-                                }
-                            });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message || 'Record saved successfully', 'success');
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 2000);
+                        } else {
+                            showToast(data.message || 'Error saving form', 'error');
+                            if (data.errors) {
+                                Object.entries(data.errors).forEach(([field, errors]) => {
+                                    const input = document.getElementById(`id_${field}`);
+                                    if (input) {
+                                        input.classList.add('is-invalid');
+                                        const feedbackDiv = document.createElement('div');
+                                        feedbackDiv.className = 'invalid-feedback';
+                                        feedbackDiv.textContent = errors.join(', ');
+                                        input.parentNode.appendChild(feedbackDiv);
+                                    }
+                                });
+                            }
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An unexpected error occurred', 'error');
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An unexpected error occurred', 'error');
+                    });
             });
         });
     </script>
 </body>
+
 </html>

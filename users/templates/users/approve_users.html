@@ -19,7 +19,7 @@
         border: 2px solid transparent;
         border-image: linear-gradient(135deg, #e0e7ff, #dbeafe) 1;
         margin-bottom: 28px;
-        box-shadow: 
+        box-shadow:
             0 6px 16px rgba(0, 0, 0, 0.08),
             0 3px 8px rgba(0, 0, 0, 0.06),
             inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -175,7 +175,7 @@
         border-radius: 20px;
         border: 2px solid transparent;
         border-image: linear-gradient(135deg, #e0e7ff, #dbeafe) 1;
-        box-shadow: 
+        box-shadow:
             0 6px 20px rgba(0, 0, 0, 0.08),
             0 3px 10px rgba(0, 0, 0, 0.06),
             inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -185,7 +185,7 @@
     }
 
     .card:hover {
-        box-shadow: 
+        box-shadow:
             0 12px 32px rgba(0, 0, 0, 0.12),
             0 6px 16px rgba(0, 0, 0, 0.08),
             inset 0 2px 0 rgba(255, 255, 255, 1),
@@ -253,7 +253,7 @@
         background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
         transform: translateY(-6px) perspective(1000px) rotateX(1deg) scale(1.01);
         border-color: #93c5fd;
-        box-shadow: 
+        box-shadow:
             0 16px 32px rgba(59, 130, 246, 0.18),
             0 8px 16px rgba(59, 130, 246, 0.12),
             inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -346,7 +346,8 @@
         flex-wrap: wrap;
     }
 
-    .btn-approve, .btn-delete {
+    .btn-approve,
+    .btn-delete {
         padding: 10px 20px;
         border: none;
         border-radius: 12px;
@@ -362,7 +363,8 @@
         overflow: hidden;
     }
 
-    .btn-approve::before, .btn-delete::before {
+    .btn-approve::before,
+    .btn-delete::before {
         content: '';
         position: absolute;
         top: 50%;
@@ -375,7 +377,8 @@
         transition: width 0.6s, height 0.6s;
     }
 
-    .btn-approve:hover::before, .btn-delete:hover::before {
+    .btn-approve:hover::before,
+    .btn-delete:hover::before {
         width: 300px;
         height: 300px;
     }
@@ -445,8 +448,15 @@
     }
 
     @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
     }
 
     .empty-state h3 {
@@ -564,7 +574,8 @@
     }
 
     /* Prevent horizontal scrolling */
-    html, body {
+    html,
+    body {
         overflow-x: hidden !important;
         width: 100% !important;
     }
@@ -581,11 +592,11 @@
         .user-details {
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         }
-        
+
         .stats-badges {
             flex-direction: column;
         }
-        
+
         .stat-badge {
             width: 100%;
             justify-content: center;
@@ -608,7 +619,8 @@
             width: 100%;
         }
 
-        .btn-approve, .btn-delete {
+        .btn-approve,
+        .btn-delete {
             width: 100%;
             justify-content: center;
         }
@@ -616,7 +628,7 @@
         .card-header h2 {
             font-size: 18px;
         }
-        
+
         .page-header h1 {
             font-size: 24px;
         }
@@ -639,16 +651,16 @@
         .card-header {
             padding: 20px;
         }
-        
+
         .empty-state {
             padding: 60px 20px;
             margin: 12px;
         }
-        
+
         .stats-badges {
             gap: 8px;
         }
-        
+
         .user-name {
             font-size: 16px;
         }
@@ -708,11 +720,13 @@
                     </div>
                     <div class="user-actions">
                         {% if not user.is_active or not user.is_approved %}
-                        <button type="button" class="btn-approve" onclick="confirmApprove('{{ user.id }}', '{{ user.username }}')">
+                        <button type="button" class="btn-approve"
+                            onclick="confirmApprove('{{ user.id }}', '{{ user.username }}')">
                             <i class="fas fa-check"></i>Approve
                         </button>
                         {% endif %}
-                        <button type="button" class="btn-delete" onclick="confirmDelete('{{ user.id }}', '{{ user.username }}')">
+                        <button type="button" class="btn-delete"
+                            onclick="confirmDelete('{{ user.id }}', '{{ user.username }}')">
                             <i class="fas fa-trash"></i>Delete
                         </button>
                     </div>
@@ -780,11 +794,11 @@
 
 <script>
     // Calculate stats on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const badges = document.querySelectorAll('.badge');
         let pendingCount = 0;
         let approvedCount = 0;
-        
+
         badges.forEach(badge => {
             if (badge.classList.contains('badge-pending')) {
                 pendingCount++;
@@ -792,7 +806,7 @@
                 approvedCount++;
             }
         });
-        
+
         document.getElementById('pending-count').textContent = pendingCount;
         document.getElementById('approved-count').textContent = approvedCount;
     });

@@ -19,7 +19,7 @@
         padding: 32px;
         margin-bottom: 32px;
         border: 2px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 
+        box-shadow:
             0 20px 60px rgba(30, 58, 95, 0.25),
             0 10px 30px rgba(0, 0, 0, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -101,7 +101,7 @@
         border-radius: 16px;
         padding: 24px;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 
+        box-shadow:
             0 8px 24px rgba(0, 0, 0, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -130,7 +130,7 @@
 
     .stat-card:hover {
         transform: translateY(-8px);
-        box-shadow: 
+        box-shadow:
             0 20px 50px rgba(0, 0, 0, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 1);
         background: white;
@@ -193,7 +193,7 @@
         color: white;
         flex-shrink: 0;
         background: linear-gradient(135deg, #2563eb 0%, #1e3a5f 100%);
-        box-shadow: 
+        box-shadow:
             0 4px 16px rgba(37, 99, 235, 0.25),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -201,7 +201,7 @@
 
     .stat-card:hover .stat-icon {
         transform: rotate(360deg) scale(1.1);
-        box-shadow: 
+        box-shadow:
             0 8px 24px rgba(37, 99, 235, 0.35),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
@@ -247,10 +247,25 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .risk-low { background: #fef3c7; color: #92400e; }
-    .risk-moderate { background: #fed7aa; color: #9a3412; }
-    .risk-high { background: #fecaca; color: #991b1b; }
-    .risk-critical { background: #fee2e2; color: #dc2626; }
+    .risk-low {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .risk-moderate {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+
+    .risk-high {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+    .risk-critical {
+        background: #fee2e2;
+        color: #dc2626;
+    }
 
     .progress-bar {
         width: 100%;
@@ -282,7 +297,7 @@
         padding: 24px;
         border-radius: 20px;
         border: 2px solid #e0e7ff;
-        box-shadow: 
+        box-shadow:
             0 8px 24px rgba(0, 0, 0, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -300,12 +315,10 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.8) 50%,
-            transparent 100%
-        );
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.8) 50%,
+                transparent 100%);
         animation: shimmer 2s infinite;
     }
 
@@ -313,6 +326,7 @@
         0% {
             left: -100%;
         }
+
         100% {
             left: 100%;
         }
@@ -349,7 +363,7 @@
 
     .dashboard-card:hover {
         transform: translateY(-8px);
-        box-shadow: 
+        box-shadow:
             0 24px 60px rgba(0, 0, 0, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 1);
         border-color: #93c5fd;
@@ -375,7 +389,7 @@
         background: linear-gradient(135deg, #2563eb, #1e3a5f);
         padding: 10px;
         border-radius: 14px;
-        box-shadow: 
+        box-shadow:
             0 4px 16px rgba(37, 99, 235, 0.25),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
@@ -489,7 +503,7 @@
     .info-card {
         background: white;
         border-radius: 20px;
-        box-shadow: 
+        box-shadow:
             0 4px 16px rgba(0, 0, 0, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
         border: 2px solid #e0e7ff;
@@ -506,12 +520,15 @@
     }
 
     @keyframes weatherPulse {
-        0%, 100% {
+
+        0%,
+        100% {
             border-color: #e0e7ff;
         }
+
         50% {
             border-color: #93c5fd;
-            box-shadow: 
+            box-shadow:
                 0 4px 20px rgba(37, 99, 235, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
@@ -548,7 +565,7 @@
 
     .info-card:hover {
         transform: translateY(-8px);
-        box-shadow: 
+        box-shadow:
             0 20px 50px rgba(0, 0, 0, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 1);
         border-color: #93c5fd;
@@ -655,7 +672,7 @@
         display: flex;
         align-items: flex-start;
         gap: 20px;
-        box-shadow: 
+        box-shadow:
             0 8px 24px rgba(16, 185, 129, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
@@ -862,7 +879,8 @@
     }
 
     /* Prevent horizontal scrolling */
-    html, body {
+    html,
+    body {
         overflow-x: hidden !important;
         width: 100% !important;
     }
@@ -918,7 +936,9 @@
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {% if combined_risk.level == 'Low' %}25{% elif combined_risk.level == 'Moderate' %}50{% elif combined_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ combined_risk.color }};"></div>
+                    <div class="progress-fill"
+                        style="width: {% if combined_risk.level == 'Low' %}25{% elif combined_risk.level == 'Moderate' %}50{% elif combined_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ combined_risk.color }};">
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -946,7 +966,8 @@
                     </div>
                     <div class="stat-content">
                         <div class="stat-label">Humidity</div>
-                        <div class="stat-value">{{ weather_data.humidity_percent }}<span class="stat-unit">%</span></div>
+                        <div class="stat-value">{{ weather_data.humidity_percent }}<span class="stat-unit">%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -959,7 +980,8 @@
                     </div>
                     <div class="stat-content">
                         <div class="stat-label">Wind Speed</div>
-                        <div class="stat-value">{{ weather_data.wind_speed_kph }}<span class="stat-unit">km/h</span></div>
+                        <div class="stat-value">{{ weather_data.wind_speed_kph }}<span class="stat-unit">km/h</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -984,7 +1006,9 @@
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {% if rain_risk.level == 'Low' %}25{% elif rain_risk.level == 'Moderate' %}50{% elif rain_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ rain_risk.color }};"></div>
+                    <div class="progress-fill"
+                        style="width: {% if rain_risk.level == 'Low' %}25{% elif rain_risk.level == 'Moderate' %}50{% elif rain_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ rain_risk.color }};">
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -1008,7 +1032,9 @@
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {% if tide_risk.level == 'Low' %}25{% elif tide_risk.level == 'Moderate' %}50{% elif tide_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ tide_risk.color }};"></div>
+                    <div class="progress-fill"
+                        style="width: {% if tide_risk.level == 'Low' %}25{% elif tide_risk.level == 'Moderate' %}50{% elif tide_risk.level == 'High' %}75{% else %}100{% endif %}%; background: {{ tide_risk.color }};">
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -1052,30 +1078,40 @@
     </div>
     <div class="info-cards-wrapper">
         <!-- Current Flood/Weather Risk Level & Alerts -->
-        <div class="info-card {% if flood_alerts and combined_risk %}alert-card-{{ combined_risk.level|lower|cut:' ' }}{% endif %}">
+        <div
+            class="info-card {% if flood_alerts and combined_risk %}alert-card-{{ combined_risk.level|lower|cut:' ' }}{% endif %}">
             <h3><i class="fas fa-exclamation-triangle"></i> Current Risk & Alerts</h3>
             <div class="info-card-content">
                 {% if combined_risk %}
-                    <div style="margin-bottom: 16px;">
-                        <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Overall Risk Level</div>
-                        <span class="risk-indicator risk-{{ combined_risk.level|lower }}" style="font-size: 14px; padding: 8px 14px;">
-                            <i class="fas fa-circle"></i>
-                            {{ combined_risk.level }}
-                        </span>
-                    </div>
+                <div style="margin-bottom: 16px;">
+                    <div
+                        style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">
+                        Overall Risk Level</div>
+                    <span class="risk-indicator risk-{{ combined_risk.level|lower }}"
+                        style="font-size: 14px; padding: 8px 14px;">
+                        <i class="fas fa-circle"></i>
+                        {{ combined_risk.level }}
+                    </span>
+                </div>
                 {% endif %}
                 {% if flood_alerts %}
-                    <div style="font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Active Alerts</div>
-                    <ul>
+                <div
+                    style="font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">
+                    Active Alerts</div>
+                <ul>
                     {% for alert in flood_alerts %}
-                        <li style="color: {% if combined_risk.color == 'yellow' %}#854d0e{% else %}{{ combined_risk.color }}{% endif %}; font-weight: 600;"><i class="fas fa-exclamation-circle" style="color: {% if combined_risk.color == 'yellow' %}#854d0e{% else %}{{ combined_risk.color }}{% endif %}; margin-right: 6px;"></i>{{ alert }}</li>
+                    <li
+                        style="color: {% if combined_risk.color == 'yellow' %}#854d0e{% else %}{{ combined_risk.color }}{% endif %}; font-weight: 600;">
+                        <i class="fas fa-exclamation-circle"
+                            style="color: {% if combined_risk.color == 'yellow' %}#854d0e{% else %}{{ combined_risk.color }}{% endif %}; margin-right: 6px;"></i>{{
+                        alert }}</li>
                     {% endfor %}
-                    </ul>
+                </ul>
                 {% else %}
-                    <div class="empty-state" style="padding: 24px; margin-top: 12px;">
-                        <i class="fas fa-check-circle"></i>
-                        <p>No active flood or weather alerts</p>
-                    </div>
+                <div class="empty-state" style="padding: 24px; margin-top: 12px;">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No active flood or weather alerts</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -1085,37 +1121,42 @@
             <h3><i class="fas fa-water"></i> Recent Flood Events</h3>
             <div class="info-card-content">
                 {% if recent_floods %}
-                    <ul>
+                <ul>
                     {% for flood in recent_floods|slice:':5' %}
-                        <li>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-calendar-alt" style="color: #3b82f6; font-size: 12px;"></i>
-                                <strong>{{ flood.event }}</strong>
-                            </div>
-                            <span>{{ flood.date|date:"F d, Y" }} • {{ flood.affected_barangays|truncatewords:3 }}</span>
-                        </li>
+                    <li>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-calendar-alt" style="color: #3b82f6; font-size: 12px;"></i>
+                            <strong>{{ flood.event }}</strong>
+                        </div>
+                        <span>{{ flood.date|date:"F d, Y" }} • {{ flood.affected_barangays|truncatewords:3 }}</span>
+                    </li>
                     {% endfor %}
-                    </ul>
+                </ul>
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <p>No recent flood events reported</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No recent flood events reported</p>
+                </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Pending Approvals (Staff Only) -->
         {% if user.is_staff and pending_approvals %}
-        <div class="info-card" style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-color: #fde047;">
-            <h3><i class="fas fa-user-check" style="color: #ca8a04; background: linear-gradient(135deg, #fef3c7, #fde68a);"></i> Pending Approvals</h3>
+        <div class="info-card"
+            style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-color: #fde047;">
+            <h3><i class="fas fa-user-check"
+                    style="color: #ca8a04; background: linear-gradient(135deg, #fef3c7, #fde68a);"></i> Pending
+                Approvals</h3>
             <div class="info-card-content">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <span class="stats-badge" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); color: #92400e; border-color: #fcd34d; font-size: 24px; padding: 12px 20px;">
+                    <span class="stats-badge"
+                        style="background: linear-gradient(135deg, #fffbeb, #fef3c7); color: #92400e; border-color: #fcd34d; font-size: 24px; padding: 12px 20px;">
                         <i class="fas fa-users"></i>
                         {{ pending_approvals }}
                     </span>
-                    <span style="color: #78350f; font-weight: 600;">user approval{{ pending_approvals|pluralize }} pending</span>
+                    <span style="color: #78350f; font-weight: 600;">user approval{{ pending_approvals|pluralize }}
+                        pending</span>
                 </div>
             </div>
         </div>
@@ -1134,7 +1175,8 @@
             <h3><i class="fas fa-list"></i> Total Activities</h3>
             <div class="info-card-content">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="font-size: 48px; font-weight: 800; color: #2563eb; line-height: 1;">{{ total_activities }}</div>
+                    <div style="font-size: 48px; font-weight: 800; color: #2563eb; line-height: 1;">{{ total_activities
+                        }}</div>
                     <div style="color: #64748b; font-size: 13px;">combined system activities recorded</div>
                 </div>
             </div>
@@ -1144,38 +1186,46 @@
             <h3><i class="fas fa-user-clock"></i> Most Active Users</h3>
             <div class="info-card-content">
                 {% if most_active_users %}
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        {% for user in most_active_users %}
-                        <div style="display: flex; align-items: center; gap: 12px; background: {% if forloop.first %}linear-gradient(135deg, #fef3c7 0%, #fde68a 100%){% else %}#f1f5f9{% endif %}; padding: 12px; border-radius: 8px; border-left: 4px solid {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">
-                            <div style="display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; background: {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %}; color: white; border-radius: 50%; font-size: 14px; font-weight: 700;">
-                                {{ forloop.counter }}
-                            </div>
-                            {% if user.profile_image %}
-                                <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">
-                            {% else %}
-                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700;">
-                                    {{ user.username|slice:":1"|upper }}
-                                </div>
-                            {% endif %}
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 14px; font-weight: 700; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    {{ user.full_name|default:user.username }}
-                                    {% if forloop.first %}<i class="fas fa-crown" style="color: #f59e0b; margin-left: 4px;"></i>{% endif %}
-                                </div>
-                                <div style="font-size: 12px; color: #64748b;">@{{ user.username }}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 18px; font-weight: 800; color: {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">{{ user.activity_count }}</div>
-                                <div style="font-size: 10px; color: #64748b; text-transform: uppercase;">activities</div>
-                            </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    {% for user in most_active_users %}
+                    <div
+                        style="display: flex; align-items: center; gap: 12px; background: {% if forloop.first %}linear-gradient(135deg, #fef3c7 0%, #fde68a 100%){% else %}#f1f5f9{% endif %}; padding: 12px; border-radius: 8px; border-left: 4px solid {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; background: {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %}; color: white; border-radius: 50%; font-size: 14px; font-weight: 700;">
+                            {{ forloop.counter }}
                         </div>
-                        {% endfor %}
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="{{ user.username }}"
+                            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">
+                        {% else %}
+                        <div
+                            style="width: 40px; height: 40px; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                        <div style="flex: 1; min-width: 0;">
+                            <div
+                                style="font-size: 14px; font-weight: 700; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ user.full_name|default:user.username }}
+                                {% if forloop.first %}<i class="fas fa-crown"
+                                    style="color: #f59e0b; margin-left: 4px;"></i>{% endif %}
+                            </div>
+                            <div style="font-size: 12px; color: #64748b;">@{{ user.username }}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div
+                                style="font-size: 18px; font-weight: 800; color: {% if forloop.first %}#f59e0b{% else %}#2563eb{% endif %};">
+                                {{ user.activity_count }}</div>
+                            <div style="font-size: 10px; color: #64748b; text-transform: uppercase;">activities</div>
+                        </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-user-slash"></i>
-                        <p>No activity data available</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No activity data available</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -1184,50 +1234,55 @@
             <h3><i class="fas fa-bolt"></i> Recent Activity Highlights</h3>
             <div class="info-card-content">
                 {% if recent_activity_highlights %}
-                    <ul>
+                <ul>
                     {% for act in recent_activity_highlights|slice:':5' %}
-                        <li>
-                            {% if act.type == 'UserLog' %}
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">USER</span>
-                                    <strong>{{ act.user.username }}</strong>
-                                </div>
-                                <span>{{ act.action }} • {{ act.timestamp|date:"M d, H:i" }}</span>
-                            {% elif act.type == 'FloodRecordActivity' %}
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">FLOOD</span>
-                                    {{ act.description|truncatewords:6 }}
-                                </div>
-                                <span>{{ act.date|date:"M d, H:i" }}</span>
-                            {% elif act.type == 'AssessmentRecord' %}
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">ASSESS</span>
-                                    {{ act.summary|truncatewords:6 }}
-                                </div>
-                                <span>{{ act.date|date:"M d, H:i" }}</span>
-                            {% elif act.type == 'ReportRecord' %}
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">REPORT</span>
-                                    {{ act.summary|truncatewords:6 }}
-                                </div>
-                                <span>{{ act.date|date:"M d, H:i" }}</span>
-                            {% elif act.type == 'CertificateRecord' %}
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">CERT</span>
-                                    {{ act.summary|truncatewords:6 }}
-                                </div>
-                                <span>{{ act.date|date:"M d, H:i" }}</span>
-                            {% else %}
-                                {{ act }}
-                            {% endif %}
-                        </li>
+                    <li>
+                        {% if act.type == 'UserLog' %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span
+                                style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">USER</span>
+                            <strong>{{ act.user.username }}</strong>
+                        </div>
+                        <span>{{ act.action }} • {{ act.timestamp|date:"M d, H:i" }}</span>
+                        {% elif act.type == 'FloodRecordActivity' %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span
+                                style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">FLOOD</span>
+                            {{ act.description|truncatewords:6 }}
+                        </div>
+                        <span>{{ act.date|date:"M d, H:i" }}</span>
+                        {% elif act.type == 'AssessmentRecord' %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span
+                                style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">ASSESS</span>
+                            {{ act.summary|truncatewords:6 }}
+                        </div>
+                        <span>{{ act.date|date:"M d, H:i" }}</span>
+                        {% elif act.type == 'ReportRecord' %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span
+                                style="background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">REPORT</span>
+                            {{ act.summary|truncatewords:6 }}
+                        </div>
+                        <span>{{ act.date|date:"M d, H:i" }}</span>
+                        {% elif act.type == 'CertificateRecord' %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span
+                                style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">CERT</span>
+                            {{ act.summary|truncatewords:6 }}
+                        </div>
+                        <span>{{ act.date|date:"M d, H:i" }}</span>
+                        {% else %}
+                        {{ act }}
+                        {% endif %}
+                    </li>
                     {% endfor %}
-                    </ul>
+                </ul>
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <p>No recent highlights available</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>No recent highlights available</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -1244,51 +1299,64 @@
             <h3><i class="fas fa-user"></i> Your Recent Activity</h3>
             <div class="info-card-content">
                 {% if user_logs %}
-                    <ul>
+                <ul>
                     {% for log in user_logs|slice:':5' %}
-                        <li>
-                            <div style="font-weight: 600;">{{ log.action }}</div>
-                            <span><i class="fas fa-clock" style="font-size: 11px;"></i> {{ log.timestamp|date:"F d, Y - g:i A" }}</span>
-                        </li>
+                    <li>
+                        <div style="font-weight: 600;">{{ log.action }}</div>
+                        <span><i class="fas fa-clock" style="font-size: 11px;"></i> {{ log.timestamp|date:"F d, Y - g:i
+                            A" }}</span>
+                    </li>
                     {% endfor %}
-                    </ul>
+                </ul>
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-user-clock"></i>
-                        <p>No recent activity found</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-user-clock"></i>
+                    <p>No recent activity found</p>
+                </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Weather Summary -->
-        <div class="info-card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc;">
-            <h3><i class="fas fa-cloud-sun" style="color: #0284c7; background: linear-gradient(135deg, #e0f2fe, #bae6fd);"></i> Weather Summary</h3>
+        <div class="info-card"
+            style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc;">
+            <h3><i class="fas fa-cloud-sun"
+                    style="color: #0284c7; background: linear-gradient(135deg, #e0f2fe, #bae6fd);"></i> Weather Summary
+            </h3>
             <div class="info-card-content">
                 {% if weather_data %}
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                        <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">TEMPERATURE</div>
-                            <div style="font-size: 28px; font-weight: 800; color: #f59e0b;">{{ weather_data.temperature_c }}°<span style="font-size: 18px;">C</span></div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                    <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">TEMPERATURE
                         </div>
-                        <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">HUMIDITY</div>
-                            <div style="font-size: 28px; font-weight: 800; color: #06b6d4;">{{ weather_data.humidity_percent }}<span style="font-size: 18px;">%</span></div>
+                        <div style="font-size: 28px; font-weight: 800; color: #f59e0b;">{{ weather_data.temperature_c
+                            }}°<span style="font-size: 18px;">C</span></div>
+                    </div>
+                    <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">HUMIDITY
                         </div>
-                        <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">WIND SPEED</div>
-                            <div style="font-size: 28px; font-weight: 800; color: #10b981;">{{ weather_data.wind_speed_kph }}<span style="font-size: 14px;">km/h</span></div>
+                        <div style="font-size: 28px; font-weight: 800; color: #06b6d4;">{{ weather_data.humidity_percent
+                            }}<span style="font-size: 18px;">%</span></div>
+                    </div>
+                    <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">WIND SPEED
                         </div>
-                        <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">RAINFALL</div>
-                            <div style="font-size: 28px; font-weight: 800; color: #3b82f6;">{% if rainfall_data %}{{ rainfall_data.value_mm }}{% else %}0{% endif %}<span style="font-size: 14px;">mm</span></div>
+                        <div style="font-size: 28px; font-weight: 800; color: #10b981;">{{ weather_data.wind_speed_kph
+                            }}<span style="font-size: 14px;">km/h</span></div>
+                    </div>
+                    <div style="background: white; padding: 16px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600;">RAINFALL
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #3b82f6;">{% if rainfall_data %}{{
+                            rainfall_data.value_mm }}{% else %}0{% endif %}<span style="font-size: 14px;">mm</span>
                         </div>
                     </div>
+                </div>
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-cloud-slash"></i>
-                        <p>Weather data unavailable</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-cloud-slash"></i>
+                    <p>Weather data unavailable</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -1299,8 +1367,11 @@
         <div class="info-card highlight-card">
             <i class="fas fa-lightbulb"></i>
             <div>
-                <div style="font-size: 12px; color: #065f46; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">💡 Safety Reminder</div>
-                <p>{% if safety_tip %}{{ safety_tip }}{% else %}Stay alert and prepared—know your evacuation routes and keep emergency kits ready!{% endif %}</p>
+                <div
+                    style="font-size: 12px; color: #065f46; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">
+                    💡 Safety Reminder</div>
+                <p>{% if safety_tip %}{{ safety_tip }}{% else %}Stay alert and prepared—know your evacuation routes and
+                    keep emergency kits ready!{% endif %}</p>
             </div>
         </div>
     </div>

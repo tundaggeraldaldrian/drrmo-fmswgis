@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,12 +54,10 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: linear-gradient(
-                135deg,
-                rgba(30, 58, 95, 0.50) 0%,
-                rgba(37, 99, 235, 0.50) 50%,
-                rgba(30, 58, 95, 0.50) 100%
-            );
+            background: linear-gradient(135deg,
+                    rgba(30, 58, 95, 0.50) 0%,
+                    rgba(37, 99, 235, 0.50) 50%,
+                    rgba(30, 58, 95, 0.50) 100%);
             pointer-events: none;
         }
 
@@ -130,7 +129,8 @@
             flex-direction: column;
             gap: 12px;
             max-width: 400px;
-            pointer-events: auto; /* allow manual close */
+            pointer-events: auto;
+            /* allow manual close */
         }
 
         .toast-notification {
@@ -252,6 +252,7 @@
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -269,6 +270,7 @@
             from {
                 width: 100%;
             }
+
             to {
                 width: 0;
             }
@@ -297,8 +299,10 @@
             transform: translateY(-50%);
             color: var(--text-muted);
             font-size: 16px;
-            z-index: 10; /* higher than bootstrap focus z-index so icon stays visible */
-            pointer-events: none; /* allow clicks to pass through to input */
+            z-index: 10;
+            /* higher than bootstrap focus z-index so icon stays visible */
+            pointer-events: none;
+            /* allow clicks to pass through to input */
         }
 
         .form-control,
@@ -391,6 +395,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Animated Satellite Map Background -->
     <div id="background-map"></div>
@@ -417,7 +422,8 @@
                 <label for="username">Username</label>
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" autocomplete="username" required>
+                    <input type="text" id="username" name="username" class="form-control"
+                        placeholder="Enter your username" autocomplete="username" required>
                 </div>
             </div>
 
@@ -425,7 +431,8 @@
                 <label for="password">Password</label>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" autocomplete="new-password" required>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your password" autocomplete="new-password" required>
                 </div>
             </div>
 
@@ -448,7 +455,7 @@
         // ============================================
         function showToast(message, type = 'info', duration = 5000) {
             const container = document.getElementById('toastContainer');
-            
+
             // Icon mapping
             const icons = {
                 success: 'fa-check-circle',
@@ -457,7 +464,7 @@
                 warning: 'fa-exclamation-triangle',
                 info: 'fa-info-circle'
             };
-            
+
             // Create toast element
             const toast = document.createElement('div');
             toast.className = `toast-notification toast-${type}`;
@@ -473,56 +480,56 @@
                 </button>
                 <div class="toast-progress"></div>
             `;
-            
+
             container.appendChild(toast);
-            
+
             // Auto-dismiss after duration
             const timer = setTimeout(() => {
                 dismissToast(toast.querySelector('.toast-close'));
             }, duration);
-            
+
             // Store timer for manual dismissal
             toast.dataset.timer = timer;
-            
+
             return toast;
         }
-        
+
         function dismissToast(button) {
             const toast = button.closest('.toast-notification');
             if (!toast) return;
-            
+
             // Clear auto-dismiss timer
             if (toast.dataset.timer) {
                 clearTimeout(parseInt(toast.dataset.timer));
             }
-            
+
             // Add hiding animation
             toast.classList.add('hiding');
-            
+
             // Remove from DOM after animation
             setTimeout(() => {
                 toast.remove();
             }, 400);
         }
-        
+
         // Display Django messages and errors as toasts on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Clear login form to prevent browser/password manager auto-fill
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
-            
+
             {% if error %}
-                showToast("{{ error|escapejs }}", "error", 5000);
+            showToast("{{ error|escapejs }}", "error", 5000);
             {% endif %}
-            
+
             {% if messages %}
-                {% for message in messages %}
-                    showToast(
-                        "{{ message|escapejs }}", 
-                        "{{ message.tags|default:'info' }}",
-                        5000
-                    );
-                {% endfor %}
+            {% for message in messages %}
+            showToast(
+                "{{ message|escapejs }}",
+                "{{ message.tags|default:'info' }}",
+                5000
+            );
+            {% endfor %}
             {% endif %}
         });
     </script>
@@ -532,10 +539,10 @@
         // ============================================
         // ANIMATED SATELLITE BACKGROUND MAP
         // ============================================
-        
+
         // Silay City coordinates
         var silayCenter = [122.975, 10.787];
-        
+
         // Create satellite layer
         var satelliteLayer = new ol.layer.Tile({
             source: new ol.source.XYZ({
@@ -543,7 +550,7 @@
                 maxZoom: 19
             })
         });
-        
+
         // Initialize background map
         var backgroundMap = new ol.Map({
             target: 'background-map',
@@ -556,20 +563,20 @@
                 rotation: 0
             })
         });
-        
+
         // Animation variables
         var animationStep = 0;
         var baseCenter = ol.proj.fromLonLat(silayCenter);
         var baseZoom = 15.5;
         var rotationSpeed = 0.0002; // Very slow rotation
         var panRadius = 500; // Meters to pan in circle
-        
+
         // Animation function
         function animateBackground() {
             animationStep += 0.0003; // Animation speed
-            
+
             var view = backgroundMap.getView();
-            
+
             // Circular panning motion
             var offsetX = Math.sin(animationStep) * panRadius;
             var offsetY = Math.cos(animationStep) * panRadius;
@@ -577,25 +584,25 @@
                 baseCenter[0] + offsetX,
                 baseCenter[1] + offsetY
             ];
-            
+
             // Smooth zoom oscillation
             var zoomOffset = Math.sin(animationStep * 0.5) * 0.3;
             var newZoom = baseZoom + zoomOffset;
-            
+
             // Very subtle rotation
             var newRotation = animationStep * rotationSpeed;
-            
+
             view.setCenter(newCenter);
             view.setZoom(newZoom);
             view.setRotation(newRotation);
-            
+
             requestAnimationFrame(animateBackground);
         }
-        
+
         // Start animation after map loads (1 second delay)
         setTimeout(() => {
             animateBackground();
         }, 1000);
-        
+
         console.log('Animated satellite background initialized');
     </script>

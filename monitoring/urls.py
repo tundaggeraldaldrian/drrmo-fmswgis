@@ -12,4 +12,5 @@ urlpatterns = [
     path('benchmark-settings/', views.benchmark_settings_view, name='benchmark_settings'),
     path('export-trends/', views.export_trends, name='export_trends'),
     path('export-flood-records/', views.export_flood_records, name='export_flood_records'),
+    path('flood-records/', views.flood_records_list, name='flood_records_list'),
 ]
