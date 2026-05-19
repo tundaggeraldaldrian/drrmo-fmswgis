@@ -347,59 +347,147 @@
             background-color: #ffffff;
             color: var(--text-dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-top: 64px;
+            margin: 0;
+            padding: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
 
-        .navbar {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
-            color: white;
+        .app-layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            min-height: 64px;
-            box-shadow: 0 2px 8px rgba(30, 58, 95, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin-left: 240px; /* Sidebar expanded width */
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow-x: hidden;
+            background: #ffffff;
+        }
+
+        .main-container.expanded {
+            margin-left: 70px; /* Sidebar collapsed width */
+        }
+
+        .nav-sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .navbar.scrolled {
-            box-shadow: 0 8px 24px rgba(30, 58, 95, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1);
+            bottom: 0;
+            width: 240px;
             background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 1500;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 24px rgba(30, 58, 95, 0.3);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        .navbar-left {
+        .nav-sidebar.collapsed {
+            width: 70px;
+            box-shadow: 2px 0 10px rgba(30, 58, 95, 0.15);
+        }
+
+        .sidebar-brand {
             display: flex;
             align-items: center;
+            padding: 20px 15px;
             gap: 12px;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            min-height: 80px;
+            box-sizing: border-box;
+            overflow: hidden;
+            width: 100%;
+            position: relative;
         }
 
-        .navbar-logo {
+        .sidebar-brand:hover {
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-logo {
             height: 40px;
             width: 40px;
             border-radius: 8px;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .navbar-title-wrapper {
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 24px;
+            left: 224px; /* 240px sidebar width - 16px (half of 32px button width) */
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2e4a 100%);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            z-index: 1600; /* Float high above map overlays and everything else */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, transform 0.3s;
+        }
+
+        .sidebar-toggle-btn:hover {
+            color: white;
+            background: #2563eb;
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
+
+        /* Target sibling button when sidebar has collapsed class to shift left position */
+        .nav-sidebar.collapsed + #sidebarToggleBtn {
+            left: 54px; /* 70px collapsed width - 16px */
+        }
+
+        /* Adjust brand padding and logo size when collapsed to ensure gorgeous spacing and zero overlap */
+        .nav-sidebar.collapsed .sidebar-brand {
+            padding: 20px 10px;
+        }
+
+        .nav-sidebar.collapsed .sidebar-logo {
+            width: 36px;
+            height: 36px;
+        }
+
+        .sidebar-brand-text {
             display: flex;
             flex-direction: column;
-            gap: 2px;
-            line-height: 1.2;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            white-space: nowrap;
         }
 
-        .navbar-title {
-            font-size: 22px;
+        .nav-sidebar.collapsed .sidebar-brand-text {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .sidebar-brand-title {
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: 0.5px;
             background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
@@ -408,59 +496,99 @@
             background-clip: text;
         }
 
-        .navbar-subtitle {
-            font-size: 11px;
+        .sidebar-brand-subtitle {
+            font-size: 9px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.75);
-            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.2px;
         }
 
-        .navbar-center {
+        .sidebar-menu {
             display: flex;
-            align-items: center;
-            gap: 24px;
+            flex-direction: column;
+            gap: 8px;
+            padding: 20px 10px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9);
+        .sidebar-link {
+            color: rgba(255, 255, 255, 0.85);
             text-decoration: none;
             font-size: 15px;
             font-weight: 600;
-            padding: 10px 18px;
+            padding: 12px 15px;
             border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 18px;
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
             overflow: hidden;
+            box-sizing: border-box;
+            min-height: 48px;
+            width: 100%;
         }
 
-        .nav-link::before {
+        .sidebar-link i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-link .sidebar-text {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .nav-sidebar.collapsed .sidebar-link .sidebar-text {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .sidebar-link::before {
             content: '';
             position: absolute;
-            top: 0;
             left: 0;
-            right: 0;
+            top: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.15);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: -1;
+            width: 4px;
+            background: #2563eb;
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
+        .sidebar-link:hover,
+        .sidebar-link.active {
             color: white;
+            background: rgba(255, 255, 255, 0.1);
             text-decoration: none;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .nav-link:hover::before,
-        .nav-link.active::before {
-            transform: scaleX(1);
+        .sidebar-link:hover::before,
+        .sidebar-link.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-link:hover i {
+            transform: scale(1.1);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .dropdown-toggle {
@@ -638,57 +766,87 @@
         }
 
         @media (max-width: 900px) {
-            .navbar {
+            .nav-sidebar {
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                left: 0;
+                right: 0;
+                width: 100% !important;
+                height: 60px;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                z-index: 1500;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+                overflow: hidden;
+            }
+
+            .main-container {
+                margin-left: 0 !important;
+                margin-bottom: 60px;
+            }
+
+            .sidebar-brand {
+                display: none !important;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0;
+                margin: 0;
+                height: 100%;
+                gap: 0;
+            }
+
+            .sidebar-link {
                 flex-direction: column;
-                align-items: stretch;
-                padding: 12px 16px;
-                min-height: auto;
-            }
-
-            .navbar-center {
                 justify-content: center;
-                gap: 8px;
-                flex-wrap: wrap;
+                align-items: center;
+                gap: 4px;
+                padding: 5px;
+                min-height: auto;
+                height: 100%;
+                border-radius: 0;
+                color: rgba(255, 255, 255, 0.7);
             }
 
-            .nav-link {
-                padding: 12px 16px;
-                min-height: 44px;
-                font-size: 14px;
+            .sidebar-link i {
+                font-size: 20px;
+            }
+
+            .sidebar-link .sidebar-text {
+                display: none !important;
+            }
+
+            .sidebar-link::before {
+                display: none !important;
+            }
+
+            .sidebar-link:hover,
+            .sidebar-link.active {
+                background: transparent;
+                color: white;
+            }
+
+            .sidebar-footer {
+                display: none !important;
+            }
+
+            .dropdown-content {
+                bottom: 100%;
+                top: auto;
+                left: auto;
+                right: 0;
+                margin-bottom: 10px;
+                margin-left: 0;
+                position: fixed;
             }
 
             .main-content {
                 padding: 24px 16px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .navbar-title {
-                font-size: 18px;
-            }
-
-            .navbar-subtitle {
-                font-size: 10px;
-            }
-
-            .navbar-logo {
-                height: 36px;
-                width: 36px;
-            }
-
-            .nav-link {
-                font-size: 13px;
-                padding: 10px 14px;
-            }
-
-            .main-content {
-                padding: 20px 12px;
-            }
-
-            .dropdown-content {
-                min-width: calc(100vw - 32px);
-                left: 16px;
-                right: 16px;
             }
         }
 
@@ -707,50 +865,55 @@
 </head>
 
 <body>
-    <!-- Modern Top Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <a href="{% url 'home' %}"
-                style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
-                <img src="{% static 'images/drrmo_logo.png' %}" alt="SCDRRMO Logo" class="navbar-logo">
-                <div class="navbar-title-wrapper">
-                    <span class="navbar-title">SCDRRMO</span>
-                    <span class="navbar-subtitle">Flood Monitoring System with GIS</span>
+    <div class="app-layout">
+        <!-- Collapsible Left Navigation Sidebar -->
+        <aside class="nav-sidebar">
+            <a href="{% if user.is_staff %}{% url 'home' %}{% else %}{% url 'map_view' %}{% endif %}" class="sidebar-brand">
+                <img src="{% static 'images/drrmo_logo.png' %}" alt="SCDRRMO Logo" class="sidebar-logo">
+                <div class="sidebar-brand-text">
+                    <span class="sidebar-brand-title">SCDRRMO</span>
+                    <span class="sidebar-brand-subtitle">Flood Monitoring System</span>
                 </div>
             </a>
-        </div>
-        <div class="navbar-center">
-            <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="{% url 'map_view' %}" class="nav-link"><i class="fas fa-map"></i> Map</a>
-            <a href="{% url 'monitoring_view' %}" class="nav-link"><i class="fas fa-chart-area"></i> Monitoring</a>
-            <a href="{% url 'flood_records_list' %}" class="nav-link"><i class="fas fa-list"></i> Flood Records</a>
-            {% if user.is_staff %}
-            <a href="{% url 'approve_users' %}" class="nav-link"><i class="fas fa-user-check"></i> User Approvals</a>
-            <div class="dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-dropdown="activity"><i class="fas fa-history"></i>
-                    Activity History</a>
-                <div class="dropdown-content">
-                    <a href="{% url 'my_activity' %}"><i class="fas fa-user"></i> Your Activity History</a>
-                    <a href="{% url 'all_activities' %}"><i class="fas fa-list"></i> All Activities</a>
+            
+            <nav class="sidebar-menu">
+                {% if user.is_staff %}
+                <a href="{% url 'home' %}" class="sidebar-link" title="Dashboard"><i class="fas fa-tachometer-alt"></i> <span class="sidebar-text">Dashboard</span></a>
+                {% endif %}
+                <a href="{% url 'map_view' %}" class="sidebar-link" title="GIS Map"><i class="fas fa-map"></i> <span class="sidebar-text">GIS Map</span></a>
+                <a href="{% url 'monitoring_view' %}" class="sidebar-link" title="Monitoring"><i class="fas fa-chart-area"></i> <span class="sidebar-text">Monitoring</span></a>
+                <a href="{% url 'flood_records_list' %}" class="sidebar-link" title="Flood Records"><i class="fas fa-list"></i> <span class="sidebar-text">Flood Records</span></a>
+                
+                {% if user.is_staff %}
+                <a href="{% url 'approve_users' %}" class="sidebar-link" title="User Approvals"><i class="fas fa-user-check"></i> <span class="sidebar-text">User Approvals</span></a>
+                <div class="dropdown">
+                    <a href="#" class="sidebar-link dropdown-toggle" data-dropdown="activity" title="Activity History"><i class="fas fa-history"></i> <span class="sidebar-text">Activity History</span></a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'my_activity' %}"><i class="fas fa-user"></i> My Activity</a>
+                        <a href="{% url 'all_activities' %}"><i class="fas fa-list"></i> All Activities</a>
+                    </div>
                 </div>
+                {% else %}
+                <a href="{% url 'my_activity' %}" class="sidebar-link" title="My Activity"><i class="fas fa-history"></i> <span class="sidebar-text">My Activity</span></a>
+                {% endif %}
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{% url 'view_profile' %}" class="sidebar-link" title="Profile"><i class="fas fa-user-cog"></i> <span class="sidebar-text">Profile</span></a>
+                {% if user.is_staff %}
+                <a href="{% url 'benchmark_settings' %}" class="sidebar-link" title="Benchmark Settings"><i class="fas fa-sliders-h"></i> <span class="sidebar-text">Benchmarks</span></a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="sidebar-link" title="Logout"><i class="fas fa-sign-out-alt"></i> <span class="sidebar-text">Logout</span></a>
             </div>
-            {% else %}
-            <a href="{% url 'my_activity' %}" class="nav-link"><i class="fas fa-history"></i> Activity History</a>
-            {% endif %}
-        </div>
-        <div class="navbar-right">
-            <div style="position: relative;">
-                <button class="settings-btn" id="settingsBtn" tabindex="0"><i class="fas fa-cog"></i></button>
-                <div class="settings-dropdown" id="settingsDropdown">
-                    <a href="{% url 'view_profile' %}"><i class="fas fa-user"></i> Profile</a>
-                    {% if user.is_staff %}
-                    <a href="{% url 'benchmark_settings' %}"><i class="fas fa-sliders-h"></i> Benchmark Settings</a>
-                    {% endif %}
-                    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+        </aside>
+        
+        <!-- Sibling toggle button outside sidebar container to fully bypass overflow-x clipping -->
+        <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Collapse Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <!-- Right Side Main Container -->
+        <div class="main-container">
 
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
@@ -760,6 +923,7 @@
     </div>
 
     <!-- Professional footer with DRRMO contact information and social links -->
+    {% block footer %}
     <footer>
         <div class="footer-container">
             <div class="footer-content">
@@ -823,6 +987,9 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
+    </div> <!-- Close .main-container -->
+    </div> <!-- Close .app-layout -->
 
     <script>
         // ============================================
@@ -900,19 +1067,6 @@
             {% endif %}
         });
 
-        // Settings dropdown toggle for accessibility
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsDropdown = document.getElementById('settingsDropdown');
-        document.addEventListener('click', function (event) {
-            if (settingsBtn.contains(event.target)) {
-                settingsDropdown.style.display = settingsDropdown.style.display === 'block' ? 'none' : 'block';
-                settingsBtn.classList.toggle('active');
-            } else if (!settingsDropdown.contains(event.target)) {
-                settingsDropdown.style.display = 'none';
-                settingsBtn.classList.remove('active');
-            }
-        });
-
         // Dropdown click toggle for Monitoring and Activity History
         const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
         dropdownToggles.forEach(toggle => {
@@ -942,22 +1096,54 @@
         });
 
         // Highlight active nav link
-        const navLinks = document.querySelectorAll('.nav-link');
+        const navLinks = document.querySelectorAll('.sidebar-link');
         navLinks.forEach(link => {
             if (link.href === window.location.href) {
                 link.classList.add('active');
             }
         });
 
-        // Enhanced navbar sticky scroll effect
-        const navbar = document.querySelector('.navbar');
-        window.addEventListener('scroll', function () {
-            if (window.scrollY > 5) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+        // Manual Sidebar Toggle with State Persistence
+        (function() {
+            const sidebar = document.querySelector('.nav-sidebar');
+            const mainContainer = document.querySelector('.main-container');
+            const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+
+            // Apply saved preference immediately
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                if (sidebar) sidebar.classList.add('collapsed');
+                if (mainContainer) mainContainer.classList.add('expanded');
+                if (sidebarToggleBtn) {
+                    const icon = sidebarToggleBtn.querySelector('i');
+                    if (icon) icon.className = 'fas fa-chevron-right';
+                    sidebarToggleBtn.title = 'Expand Sidebar';
+                }
             }
-        });
+
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!sidebar || !mainContainer) return;
+                    
+                    const isCollapsed = sidebar.classList.toggle('collapsed');
+                    mainContainer.classList.toggle('expanded');
+                    
+                    const icon = sidebarToggleBtn.querySelector('i');
+                    if (icon) {
+                        if (isCollapsed) {
+                            icon.className = 'fas fa-chevron-right';
+                            sidebarToggleBtn.title = 'Expand Sidebar';
+                        } else {
+                            icon.className = 'fas fa-chevron-left';
+                            sidebarToggleBtn.title = 'Collapse Sidebar';
+                        }
+                    }
+                    
+                    localStorage.setItem('sidebar-collapsed', isCollapsed);
+                });
+            }
+        })();
     </script>
 
     {% block scripts %}{% endblock %}

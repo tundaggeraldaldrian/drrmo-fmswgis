@@ -5,6 +5,8 @@
 
 {% block header_title %}SCDRRMO - FMSWGIS{% endblock %}
 
+{% block footer %}{% endblock %}
+
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/ol.css' %}">
 <style>
@@ -31,14 +33,16 @@
         background: #ffffff;
         color: var(--text-dark);
         margin: 0;
-        padding-top: 64px !important;
+        padding-top: 0 !important;
     }
 
     .map-container {
         display: flex;
-        height: calc(100vh - 64px);
+        height: 100vh;
+        width: 100%;
         background: var(--light-gray);
         margin-bottom: 0;
+        position: relative;
     }
 
     .sidebar {
@@ -57,6 +61,120 @@
         flex-direction: column;
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    /* Floating Card Overlays with Glassmorphism */
+    .floating-card {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 2px solid rgba(224, 231, 255, 0.8);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    /* Legend Card Overlay (Bottom-Left Edge) */
+    #legend-card {
+        bottom: 20px;
+        left: 20px;
+        width: 220px;
+        padding: 12px 14px;
+    }
+
+    /* Settings Card Overlay (Lower Right Edge) */
+    #settings-card {
+        bottom: 20px;
+        right: 20px;
+        width: 260px;
+        padding: 12px 14px;
+    }
+
+    /* Bulletproof Collapsed Circular State for Card Overlays */
+    .floating-card.collapsed {
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: var(--primary-blue) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25) !important;
+        cursor: pointer;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Toggle Buttons */
+    .card-toggle-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        z-index: 10;
+        border-radius: 50%;
+    }
+
+    .card-toggle-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--secondary-blue);
+    }
+
+    /* Collapsed state toggle button centered */
+    .floating-card.collapsed .card-toggle-btn {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        color: white !important;
+        background: transparent !important;
+        top: auto !important;
+        right: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .floating-card.collapsed .card-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* Hide contents when collapsed */
+    .floating-card.collapsed .card-content-wrapper {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        height: 0 !important;
+    }
+
+    .card-content-wrapper {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    /* Settings & Legend Title */
+    .settings-card-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--primary-blue);
+        margin-bottom: 12px;
+        padding-right: 24px; /* Leave space for toggle button */
+        letter-spacing: -0.01em;
+    }
+
 
     .sidebar-header {
         padding: 24px 24px 20px;
@@ -252,14 +370,39 @@
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Interactive Legend item styling additions */
     .legend-item:hover {
-        background: rgba(59, 130, 246, 0.08);
-        padding-left: 20px;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        background: rgba(30, 58, 95, 0.05);
+        transform: translateX(4px);
     }
-
+    
     .legend-item:hover::before {
         transform: scaleY(1);
+    }
+
+    .legend-clear-btn {
+        margin-top: 12px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(220, 38, 38, 0.08);
+        color: #dc2626;
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 1px dashed rgba(220, 38, 38, 0.25);
+    }
+    
+    .legend-clear-btn:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2);
     }
 
     .legend-item:last-child {
@@ -277,10 +420,7 @@
         transition: all 0.3s ease;
     }
 
-    .legend-item:hover .legend-color {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
+    /* Legend hover color effects removed */
 
     .switch-group {
         margin-bottom: 0;
@@ -719,10 +859,9 @@
     #assessment-panel {
         position: fixed;
         right: -420px;
-        top: 60px;
-        /* Account for header */
+        top: 0;
         width: 420px;
-        height: calc(100vh - 60px);
+        height: 100vh;
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         box-shadow:
             -4px 0 24px rgba(0, 0, 0, 0.15),
@@ -924,113 +1063,112 @@
 {% block content %}
 <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
 <div class="map-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Silay City Flood Map</h2>
-            <div class="sidebar-subtitle">Interactive Risk Assessment</div>
-        </div>
-
-        <div class="sidebar-content">
-            <!-- Barangay Selection -->
-            <div class="section">
-                <div class="section-title">Select Barangay</div>
-                <select id="barangay-select">
-                    <option value="">View All Barangays</option>
-                    {% for name in barangay_names %}
-                    <option value="{{ name }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Map View Switch -->
-            <div class="section">
-                <div class="section-title">Map Type</div>
-                <div class="switch-group">
-                    <div class="switch-container">
-                        <button class="switch-btn" id="osm-btn">Street</button>
-                        <button class="switch-btn active" id="satellite-btn">Satellite</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Layer Settings -->
-            <div class="section">
-                <div class="section-title">Layer Settings</div>
-                <label class="toggle-switch">
-                    <span class="toggle-label">Flood Risk Layer</span>
-                    <div class="toggle-input">
-                        <input type="checkbox" id="flood-layer-toggle" checked>
-                        <span class="slider"></span>
-                    </div>
-                </label>
-            </div>
-
-            <!-- Graph/Table Toggle -->
-            <div class="section" style="display: none;">
-                <div class="section-title">Display Type</div>
-                <div class="switch-group">
-                    <div class="switch-container">
-                        <button class="switch-btn active" id="graph-btn">Graph</button>
-                        <button class="switch-btn" id="table-btn">Table</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Graph Section -->
-            <div class="section" style="display: none;">
-                <div class="chart-container">
-                    <canvas id="risk-graph" width="280" height="180"></canvas>
-                </div>
-                <div id="risk-table" style="display: none;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Risk Level</th>
-                                <th>Area & Percentage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="risk-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Legend -->
-            <div class="legend">
-                <div class="legend-title">Flood Susceptibility</div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #0a255b;"></div>
-                    <span>Very High Risk</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #6124d8;"></div>
-                    <span>High Risk</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #954fc9;"></div>
-                    <span>Moderate Risk</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #b9b2c8;"></div>
-                    <span>Low Risk</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Map Container -->
     <div id="map" data-barangays='{{ barangays_json|safe }}' data-floods='{{ flood_areas_json|safe }}'>
         <div id="popup"></div>
 
+        <!-- Floating Legend Card Overlay (Left Edge) -->
+        <div id="legend-card" class="floating-card">
+            <button class="card-toggle-btn" id="legendToggleBtn" title="Minimize Legend">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="card-content-wrapper" id="legendContent">
+                <div class="settings-card-title">Flood Susceptibility</div>
+                <div class="legend-item" data-haz-code="VHF">
+                    <div class="legend-color" style="background-color: #0a255b;"></div>
+                    <span>Very High Risk</span>
+                </div>
+                <div class="legend-item" data-haz-code="HF">
+                    <div class="legend-color" style="background-color: #6124d8;"></div>
+                    <span>High Risk</span>
+                </div>
+                <div class="legend-item" data-haz-code="MF">
+                    <div class="legend-color" style="background-color: #954fc9;"></div>
+                    <span>Moderate Risk</span>
+                </div>
+                <div class="legend-item" data-haz-code="LF">
+                    <div class="legend-color" style="background-color: #b9b2c8;"></div>
+                    <span>Low Risk</span>
+                </div>
+                <div class="legend-clear-btn" id="clear-legend-filter" style="display: none;">
+                    <i class="fas fa-times-circle"></i> Clear Filter
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Map Controls Settings Card Overlay (Lower Right Edge) -->
+        <div id="settings-card" class="floating-card">
+            <button class="card-toggle-btn" id="settingsToggleBtn" title="Minimize Controls">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="card-content-wrapper" id="settingsContent">
+                <div class="settings-card-title">Map Controls</div>
+                
+                <!-- Barangay Selection -->
+                <div class="section">
+                    <div class="section-title">Select Barangay</div>
+                    <select id="barangay-select">
+                        <option value="">View All Barangays</option>
+                        {% for name in barangay_names %}
+                        <option value="{{ name }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Map View Switch -->
+                <div class="section">
+                    <div class="section-title">Map Type</div>
+                    <div class="switch-group">
+                        <div class="switch-container">
+                            <button class="switch-btn" id="osm-btn">Street</button>
+                            <button class="switch-btn active" id="satellite-btn">Satellite</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer Settings -->
+                <div class="section">
+                    <div class="section-title">Layer Settings</div>
+                    <label class="toggle-switch">
+                        <span class="toggle-label">Flood Risk Layer</span>
+                        <div class="toggle-input">
+                            <input type="checkbox" id="flood-layer-toggle" checked>
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <!-- Real-time Flood Risk Alert Banner -->
-        <div id="risk-alert-banner" style="display: none;">
-            <div class="risk-banner-content">
+        <div id="risk-alert-banner" {% if combined_risk %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+            <div class="risk-banner-content {% if combined_risk.level == 'High Risk' %}risk-high{% elif combined_risk.level == 'Moderate Risk' %}risk-moderate{% else %}risk-low{% endif %}">
                 <div class="risk-banner-icon">
+                    {% if combined_risk.level == 'High Risk' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                    {% elif combined_risk.level == 'Moderate Risk' %}
                     <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                    <i class="fas fa-check-circle"></i>
+                    {% endif %}
                 </div>
                 <div class="risk-banner-text">
-                    <div class="risk-banner-title" id="risk-banner-title">Loading...</div>
-                    <div class="risk-banner-details" id="risk-banner-details">Fetching current conditions...</div>
+                    <div class="risk-banner-title" id="risk-banner-title">
+                        {% if combined_risk.level == 'High Risk' %}
+                        <i class="fas fa-exclamation-circle"></i> HIGH FLOOD RISK ALERT
+                        {% elif combined_risk.level == 'Moderate Risk' %}
+                        <i class="fas fa-exclamation-triangle"></i> MODERATE FLOOD RISK ALERT
+                        {% else %}
+                        <i class="fas fa-check-circle"></i> NORMAL CONDITIONS
+                        {% endif %}
+                    </div>
+                    <div class="risk-banner-details" id="risk-banner-details">
+                        <strong>Current:</strong> Rainfall {{ rainfall_data.value_mm|floatformat:1 }}mm | Tide {{ tide_data.height_m|floatformat:2 }}m
+                        <br>
+                        <small style="opacity: 0.9;">
+                            ℹ️ {% if combined_risk.level == 'High Risk' %}Critical zones (Very High & High susceptibility) highlighted - immediate action required{% elif combined_risk.level == 'Moderate Risk' %}Moderate risk zones highlighted - monitor conditions closely{% else %}All zones within safe parameters - routine monitoring{% endif %}
+                        </small>
+                    </div>
                 </div>
                 <div class="risk-banner-close" onclick="hideRiskBanner()">
                     <i class="fas fa-times"></i>
@@ -1083,7 +1221,7 @@
         top: 20px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1000;
+        z-index: 2000;
         min-width: 400px;
         max-width: 600px;
         animation: slideDown 0.5s ease-out;
@@ -1224,8 +1362,8 @@
         layers: [osmLayer, satelliteLayer],
         controls: [], // Remove default attribution and zoom controls
         view: new ol.View({
-            center: ol.proj.fromLonLat([122.975, 10.787]),
-            zoom: 12
+            center: ol.proj.fromLonLat([123.05, 10.76]),
+            zoom: 11.5
         })
     });
 
@@ -1252,11 +1390,11 @@
         })
     });
 
-    // Default style for barangays
+    // Default style for barangays - Neon Cyan Cyber Grid Outlines
     var defaultBarangayStyle = new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#6b7280',
-            width: 2
+            color: 'rgba(6, 182, 212, 0.45)', // Premium neon cyan
+            width: 1.5
         }),
         fill: new ol.style.Fill({
             color: 'rgba(0, 0, 0, 0)'
@@ -1299,6 +1437,107 @@
         });
     }
 
+    // Active Legend Map Filter state
+    var activeRiskFilter = null;
+
+    // Dynamic Breathing Neon Pulse Animation Loop (Throttled to 10 FPS for 85% CPU saving)
+    var pulseOpacity = 0.65;
+    var pulseDirection = -1;
+    setInterval(function() {
+        // Only trigger redraw if there is active risk highlighting to show and active risk filter is not locking rendering
+        if (activeRiskFilter !== null) return;
+        var hasActiveAlert = currentRiskData && currentRiskData.zones_to_highlight && currentRiskData.zones_to_highlight.length > 0;
+        if (!hasActiveAlert) return;
+        
+        pulseOpacity += pulseDirection * 0.03; // Smooth breathing steps
+        if (pulseOpacity < 0.45) {
+            pulseOpacity = 0.45;
+            pulseDirection = 1;
+        } else if (pulseOpacity > 0.75) {
+            pulseOpacity = 0.75;
+            pulseDirection = -1;
+        }
+        map.render();
+    }, 100);
+
+    // Helper function to generate premium 3D Volumetric Extrusion Styles
+    function getExtrudedStyle(feature, isHighlighted, highlightColor) {
+        var hazCode = feature.get('haz_code');
+        
+        // Premium color mapping
+        var colorMap = {
+            'VHF': '#0a255b',
+            'HF': '#6124d8',
+            'MF': '#954fc9',
+            'LF': '#b9b2c8'
+        };
+        
+        var baseColor = colorMap[hazCode] || '#ffffff';
+        var activeColor = isHighlighted ? (highlightColor || '#fbbf24') : baseColor;
+        var rgb = hexToRgb(activeColor);
+        
+        // Metres offset translations [dx, dy] for 3D extrusion effect
+        var heightMap = {
+            'VHF': [40, 40],
+            'HF': [25, 25],
+            'MF': [12, 12],
+            'LF': [0, 0]
+        };
+        var offset = heightMap[hazCode] || [0, 0];
+        
+        var styles = [];
+        
+        // 1. Bottom shadow layer (flat on ground, dark shadow)
+        if (offset[0] > 0) {
+            styles.push(new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(0, 0, 0, 0.12)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 0, 0.15)',
+                    width: 1
+                })
+            }));
+        }
+        
+        // 2. Extruded Volume Walls (connecting base to surface)
+        if (offset[0] > 0) {
+            styles.push(new ol.style.Style({
+                geometry: function(f) {
+                    var geom = f.getGeometry().clone();
+                    geom.translate(offset[0] / 2, offset[1] / 2);
+                    return geom;
+                },
+                fill: new ol.style.Fill({
+                    color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.25)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.35)',
+                    width: 1.5
+                })
+            }));
+        }
+        
+        // 3. Floating top cap surface layer (glassmorphic visual)
+        var fillOpacity = isHighlighted ? pulseOpacity : 0.6;
+        styles.push(new ol.style.Style({
+            geometry: function(f) {
+                var geom = f.getGeometry().clone();
+                geom.translate(offset[0], offset[1]);
+                return geom;
+            },
+            fill: new ol.style.Fill({
+                color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', ' + fillOpacity + ')'
+            }),
+            stroke: new ol.style.Stroke({
+                color: activeColor,
+                width: isHighlighted ? 3 : 1.5
+            })
+        }));
+        
+        return styles;
+    }
+
     // Load flood susceptibility data
     var floodData = JSON.parse(document.getElementById('map').dataset.floods || '[]');
     if (floodData.type === 'FeatureCollection' && floodData.features) {
@@ -1308,27 +1547,8 @@
                 featureProjection: 'EPSG:3857'
             });
 
-            // Color mapping for flood risk levels
-            var colorMap = {
-                'VHF': '#0a255b',
-                'HF': '#6124d8',
-                'MF': '#954fc9',
-                'LF': '#b9b2c8'
-            };
-
-            var color = colorMap[feature.properties.haz_code] || '#ffffff';
-            var rgb = hexToRgb(color);
-
-            floodFeature.setStyle(new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: '#000000',
-                    width: 0.5
-                }),
-                fill: new ol.style.Fill({
-                    color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.6)'
-                })
-            }));
-
+            // Set beautiful 3D Extrusion Style
+            floodFeature.setStyle(getExtrudedStyle(floodFeature, false));
             floodVectorSource.addFeature(floodFeature);
         });
     }
@@ -1342,7 +1562,7 @@
     var barangayLayer = new ol.layer.Vector({
         source: barangayVectorSource,
         zIndex: 2,
-        visible: false
+        visible: true
     });
 
     var pinLayer = new ol.layer.Vector({
@@ -1412,10 +1632,11 @@
 
     // Bar graph and table setup
     var canvas = document.getElementById('risk-graph');
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas ? canvas.getContext('2d') : null;
     var tableBody = document.getElementById('risk-table-body');
 
     function drawBarGraph(data) {
+        if (!canvas || !ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         var barWidth = (canvas.width / 4) * 0.7;
         var maxHeight = canvas.height - 50;
@@ -1463,6 +1684,7 @@
     }
 
     function updateTable(data) {
+        if (!tableBody) return;
         tableBody.innerHTML = '';
         var totalArea = data.totalArea || Object.values(data.areas).reduce((a, b) => a + b, 0);
         var totalZones = data.totalZones || Object.values(data.zoneCount).reduce((a, b) => a + b, 0);
@@ -1545,26 +1767,39 @@
 
     // Initial display
     var graphVisible = true;
-    drawBarGraph(calculateRiskPercentages(''));
+    if (canvas && ctx) {
+        drawBarGraph(calculateRiskPercentages(''));
+    }
 
     // Toggle between graph and table
-    document.getElementById('graph-btn').addEventListener('click', function () {
-        graphVisible = true;
-        this.classList.add('active');
-        document.getElementById('table-btn').classList.remove('active');
-        document.getElementById('risk-graph').style.display = 'block';
-        document.getElementById('risk-table').style.display = 'none';
-        drawBarGraph(calculateRiskPercentages(document.getElementById('barangay-select').value));
-    });
+    var graphBtn = document.getElementById('graph-btn');
+    var tableBtn = document.getElementById('table-btn');
 
-    document.getElementById('table-btn').addEventListener('click', function () {
-        graphVisible = false;
-        this.classList.add('active');
-        document.getElementById('graph-btn').classList.remove('active');
-        document.getElementById('risk-graph').style.display = 'none';
-        document.getElementById('risk-table').style.display = 'block';
-        updateTable(calculateRiskPercentages(document.getElementById('barangay-select').value));
-    });
+    if (graphBtn) {
+        graphBtn.addEventListener('click', function () {
+            graphVisible = true;
+            this.classList.add('active');
+            if (tableBtn) tableBtn.classList.remove('active');
+            var riskGraphEl = document.getElementById('risk-graph');
+            if (riskGraphEl) riskGraphEl.style.display = 'block';
+            var riskTableEl = document.getElementById('risk-table');
+            if (riskTableEl) riskTableEl.style.display = 'none';
+            drawBarGraph(calculateRiskPercentages(document.getElementById('barangay-select').value));
+        });
+    }
+
+    if (tableBtn) {
+        tableBtn.addEventListener('click', function () {
+            graphVisible = false;
+            this.classList.add('active');
+            if (graphBtn) graphBtn.classList.remove('active');
+            var riskGraphEl = document.getElementById('risk-graph');
+            if (riskGraphEl) riskGraphEl.style.display = 'none';
+            var riskTableEl = document.getElementById('risk-table');
+            if (riskTableEl) riskTableEl.style.display = 'block';
+            updateTable(calculateRiskPercentages(document.getElementById('barangay-select').value));
+        });
+    }
 
     // Initial graph and update on selection
     document.getElementById('barangay-select').addEventListener('change', function () {
@@ -1592,11 +1827,11 @@
                 });
             }
         } else {
-            map.getView().setCenter(ol.proj.fromLonLat([122.975, 10.787]));
-            map.getView().setZoom(12);
+            map.getView().setCenter(ol.proj.fromLonLat([123.05, 10.76]));
+            map.getView().setZoom(11.5);
 
-            // Hide the barangay layer when viewing all barangays
-            barangayLayer.setVisible(false);
+            // Keep the barangay layer visible to frame the city beautifully
+            barangayLayer.setVisible(true);
 
             barangaysData.features.forEach(function (feature) {
                 var barangayFeature = new ol.format.GeoJSON().readFeature(feature, {
@@ -1608,9 +1843,9 @@
             });
         }
         if (graphVisible) {
-            drawBarGraph(calculateRiskPercentages(selectedBarangay));
+            if (canvas && ctx) drawBarGraph(calculateRiskPercentages(selectedBarangay));
         } else {
-            updateTable(calculateRiskPercentages(selectedBarangay));
+            if (tableBody) updateTable(calculateRiskPercentages(selectedBarangay));
         }
     });
 
@@ -1862,7 +2097,7 @@
     var originalFloodStyles = new Map(); // Store original styles for restoration
 
     // Function to get highlighted style based on risk level
-    function getHighlightedStyle(hazCode, riskColor) {
+    function getHighlightedStyle(feature, riskColor) {
         var colorMap = {
             'yellow': '#fbbf24',  // Low risk - yellow/amber
             'orange': '#f97316',  // Moderate risk - orange
@@ -1870,17 +2105,7 @@
         };
 
         var highlightColor = colorMap[riskColor] || '#fbbf24';
-        var rgb = hexToRgb(highlightColor);
-
-        return new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: highlightColor,
-                width: 3
-            }),
-            fill: new ol.style.Fill({
-                color: 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.75)'
-            })
-        });
+        return getExtrudedStyle(feature, true, highlightColor);
     }
 
     // Function to update map highlighting based on current risk
@@ -1915,7 +2140,7 @@
                         }
 
                         // Apply highlighted style with animation
-                        feature.setStyle(getHighlightedStyle(hazCode, data.risk_color));
+                        feature.setStyle(getHighlightedStyle(feature, data.risk_color));
                     } else {
                         // Restore original style if it was highlighted before
                         if (originalFloodStyles.has(feature.ol_uid)) {
@@ -2001,6 +2226,131 @@
             updateMapRiskHighlighting();
         }
     });
+
+    // ============================================
+    // FLOATING OVERLAY CARDS MINIMIZE/COLLAPSE SYSTEM
+    // ============================================
+    const legendCard = document.getElementById('legend-card');
+    const legendToggleBtn = document.getElementById('legendToggleBtn');
+    const settingsCard = document.getElementById('settings-card');
+    const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+
+    if (legendToggleBtn && legendCard) {
+        legendToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            legendCard.classList.toggle('collapsed');
+            const icon = legendToggleBtn.querySelector('i');
+            if (legendCard.classList.contains('collapsed')) {
+                icon.className = 'fas fa-list-ul';
+                legendToggleBtn.title = 'Expand Legend';
+            } else {
+                icon.className = 'fas fa-times';
+                legendToggleBtn.title = 'Minimize Legend';
+            }
+        });
+    }
+
+    if (settingsToggleBtn && settingsCard) {
+        settingsToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            settingsCard.classList.toggle('collapsed');
+            const icon = settingsToggleBtn.querySelector('i');
+            if (settingsCard.classList.contains('collapsed')) {
+                icon.className = 'fas fa-cog';
+                settingsToggleBtn.title = 'Expand Controls';
+            } else {
+                icon.className = 'fas fa-times';
+                settingsToggleBtn.title = 'Minimize Controls';
+            }
+        });
+    }
+
+    // ============================================
+    // INTERACTIVE LEGEND CLICKABLE MAP FILTERS
+    // ============================================
+    var legendItems = document.querySelectorAll('#legend-card .legend-item');
+    var clearFilterBtn = document.getElementById('clear-legend-filter');
+
+    legendItems.forEach(item => {
+        item.style.cursor = 'pointer';
+        item.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var hazCode = this.getAttribute('data-haz-code');
+            
+            if (activeRiskFilter === hazCode) {
+                // Click again to reset filter
+                clearLegendFilter();
+            } else {
+                activeRiskFilter = hazCode;
+                
+                // Visual feedback in legend card (dim all other rows)
+                legendItems.forEach(li => {
+                    if (li.getAttribute('data-haz-code') === hazCode) {
+                        li.style.opacity = '1';
+                        li.style.fontWeight = '800';
+                        li.style.transform = 'translateX(6px)';
+                        li.style.background = 'rgba(6, 182, 212, 0.08)';
+                    } else {
+                        li.style.opacity = '0.35';
+                        li.style.fontWeight = '600';
+                        li.style.transform = 'none';
+                        li.style.background = 'transparent';
+                    }
+                });
+                
+                if (clearFilterBtn) clearFilterBtn.style.display = 'flex';
+                applyLegendFilter();
+            }
+        });
+    });
+
+    if (clearFilterBtn) {
+        clearFilterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            clearLegendFilter();
+        });
+    }
+
+    function clearLegendFilter() {
+        activeRiskFilter = null;
+        legendItems.forEach(li => {
+            li.style.opacity = '1';
+            li.style.fontWeight = '600';
+            li.style.transform = 'none';
+            li.style.background = 'transparent';
+        });
+        if (clearFilterBtn) clearFilterBtn.style.display = 'none';
+        applyLegendFilter();
+    }
+
+    function applyLegendFilter() {
+        floodVectorSource.getFeatures().forEach(feature => {
+            var hazCode = feature.get('haz_code');
+            
+            if (activeRiskFilter === null) {
+                // Restore all 3D styles
+                var isHighlighted = currentRiskData && currentRiskData.zones_to_highlight && currentRiskData.zones_to_highlight.includes(hazCode);
+                if (isHighlighted) {
+                    var colorMap = { 'yellow': '#fbbf24', 'orange': '#f97316', 'red': '#dc2626' };
+                    var highlightColor = colorMap[currentRiskData.risk_color] || '#fbbf24';
+                    feature.setStyle(getExtrudedStyle(feature, true, highlightColor));
+                } else {
+                    feature.setStyle(getExtrudedStyle(feature, false));
+                }
+            } else {
+                // Filter active
+                if (hazCode === activeRiskFilter) {
+                    // Accentuate the active layer with high visibility cyber cyan glow!
+                    feature.setStyle(getExtrudedStyle(feature, true, '#06b6d4'));
+                } else {
+                    // Hide other features
+                    feature.setStyle([]);
+                }
+            }
+        });
+    }
 
     console.log('Real-time flood risk highlighting system initialized');
 </script>

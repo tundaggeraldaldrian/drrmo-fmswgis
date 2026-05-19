@@ -220,6 +220,8 @@ def admin_register(request):
     return render(request, 'users/admin_register.html', {'form': form})
 @login_required
 def home(request):
+    if not request.user.is_staff:
+        return redirect('map_view')
     context = {
         'pending_approvals': CustomUser.objects.filter(is_active=False, is_approved=False).count(),
         'recent_logs': UserLog.objects.all().order_by('-timestamp')[:5],
